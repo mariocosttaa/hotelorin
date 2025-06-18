@@ -1,12 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
-        "./src/**/*.{html,js,jsx,ts,tsx}",
         "./resources/js/**/*.{js,jsx,ts,tsx}",
         "./resources/js/shared/**/*.{js,jsx,ts,tsx}",
         "./resources/css/**/*.css",
-        "./public/assets/css/**/*.css",
-        "./index.html"
+        "./resources/views/**/*.blade.php",
+        "./app/**/*.php",
+        "./routes/**/*.php",
     ],
     future: {
         hoverOnlyWhenSupported: true,
@@ -18,23 +18,80 @@ export default {
     theme: {
         extend: {
             colors: {
-                'primary': '#3b82f6',
-                'primary-dark': '#2563eb',
-                'accent-dark': '#3b82f6',
-                'accent-dark-hover': '#2563eb',
-                'dark-bg': '#0a0a0a',
-                'dark-bg-secondary': '#1c2526',
-                'dark-card': 'rgba(10, 10, 10, 0.85)',
-                'dark-card-hover': 'rgba(10, 10, 10, 0.95)',
-                'dark-button': '#334155',
-                'dark-button-hover': '#1e293b',
-                'glass': 'rgba(255, 255, 255, 0.15)',
-                'glass-dark': 'rgba(10, 10, 10, 0.25)',
-                'bg-light': '#f3f4f6',
+                border: 'hsl(var(--border))',
+                input: 'hsl(var(--input))',
+                ring: 'hsl(var(--ring))',
+                background: 'hsl(var(--background))',
+                foreground: 'hsl(var(--foreground))',
+                primary: {
+                    DEFAULT: 'hsl(var(--primary))',
+                    foreground: 'hsl(var(--primary-foreground))'
+                },
+                secondary: {
+                    DEFAULT: 'hsl(var(--secondary))',
+                    foreground: 'hsl(var(--secondary-foreground))'
+                },
+                destructive: {
+                    DEFAULT: 'hsl(var(--destructive))',
+                    foreground: 'hsl(var(--destructive-foreground))'
+                },
+                muted: {
+                    DEFAULT: 'hsl(var(--muted))',
+                    foreground: 'hsl(var(--muted-foreground))'
+                },
+                accent: {
+                    DEFAULT: 'hsl(var(--accent))',
+                    foreground: 'hsl(var(--accent-foreground))'
+                },
+                popover: {
+                    DEFAULT: 'hsl(var(--popover))',
+                    foreground: 'hsl(var(--popover-foreground))'
+                },
+                card: {
+                    DEFAULT: 'hsl(var(--card))',
+                    foreground: 'hsl(var(--card-foreground))'
+                },
+                sidebar: {
+                    DEFAULT: 'hsl(var(--sidebar-background))',
+                    foreground: 'hsl(var(--sidebar-foreground))',
+                    primary: 'hsl(var(--sidebar-primary))',
+                    'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+                    accent: 'hsl(var(--sidebar-accent))',
+                    'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+                    border: 'hsl(var(--sidebar-border))',
+                    ring: 'hsl(var(--sidebar-ring))'
+                }
             },
-        },
+            borderRadius: {
+                lg: 'var(--radius)',
+                md: 'calc(var(--radius) - 2px)',
+                sm: 'calc(var(--radius) - 4px)'
+            },
+            keyframes: {
+                'accordion-down': {
+                    from: {
+                        height: '0'
+                    },
+                    to: {
+                        height: 'var(--radix-accordion-content-height)'
+                    }
+                },
+                'accordion-up': {
+                    from: {
+                        height: 'var(--radix-accordion-content-height)'
+                    },
+                    to: {
+                        height: '0'
+                    }
+                }
+            },
+            animation: {
+                'accordion-down': 'accordion-down 0.2s ease-out',
+                'accordion-up': 'accordion-up 0.2s ease-out'
+            }
+        }
     },
-    plugins: [],
+    plugins: [require("tailwindcss-animate")],
     corePlugins: {
         preflight: true,
     },
