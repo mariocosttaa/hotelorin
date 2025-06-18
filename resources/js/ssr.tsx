@@ -8,7 +8,7 @@ import { CurrencyProvider } from './shared/context/CurrencyContext';
 import { ToastProvider } from './shared/components/ToastProvider';
 import { determineCSSByUrl } from './shared/utils/cssLoader';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME;
 
 createServer(async (page: any) => {
     // Initialize i18n with language from URL path
