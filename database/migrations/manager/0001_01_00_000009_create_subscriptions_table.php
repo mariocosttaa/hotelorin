@@ -43,7 +43,7 @@ return new class extends Migration
 
         Schema::create('subscription_invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenancy_id');
+            $table->foreignId('tenant_id');
             $table->foreignId('payment_gateway_log_id')->nullable();
             $table->foreignId('subscription_id')->nullable();
             $table->foreignId('subscription_price_id')->nullable();
@@ -92,7 +92,7 @@ return new class extends Migration
         Schema::create('subscription_try_pay', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->foreignId('tenancy_id')->nullable();
+            $table->foreignId('tenant_id')->nullable();
             $table->foreignId('subscription_id')->nullable();
             $table->foreignId('subscription_price_id')->nullable();
             $table->integer('price')->default(0);
@@ -126,9 +126,9 @@ return new class extends Migration
         });
 
         Schema::table('subscription_invoices', function (Blueprint $table) {
-            $table->foreign('tenancy_id', 'subscription_invoices_tenancy_id_foreign')
+            $table->foreign('tenant_id', 'subscription_invoices_tenant_id_foreign')
                 ->references('id')
-                ->on('tenancys')
+                ->on('tenants')
                 ->onDelete('cascade');
 
             $table->foreign('payment_gateway_log_id', 'subscription_invoices_payment_gateway_log_id_foreign')
@@ -187,9 +187,9 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('cascade');
 
-            $table->foreign('tenancy_id', 'subscription_try_pay_tenancy_id_foreign')
+            $table->foreign('tenant_id', 'subscription_try_pay_tenant_id_foreign')
                 ->references('id')
-                ->on('tenancys')
+                ->on('tenants')
                 ->onDelete('cascade');
 
             $table->foreign('subscription_id', 'subscription_try_pay_subscription_id_foreign')

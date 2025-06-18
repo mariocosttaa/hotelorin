@@ -1,44 +1,44 @@
 <?php
 
-namespace App\Console\Commands\Tenancy;
+namespace App\Console\Commands\Tenant;
 
-use App\Models\Manager\TenancyModel;
+use App\Models\Manager\TenantModel;
 
-use Database\Migrations\Tenancy\CreateIconsTable;
-use Database\Migrations\Tenancy\CreateNetworksTable;
-use Database\Migrations\Tenancy\CreateAircraftsTable;
-use Database\Migrations\Tenancy\CreateAirlineTable;
-use Database\Migrations\Tenancy\CreateRanksTable;
-use Database\Migrations\Tenancy\CreateRolesTable;
-use Database\Migrations\Tenancy\CreateReservedFlightsTable;
-use Database\Migrations\Tenancy\CreateCharterFlightTable;
-use Database\Migrations\Tenancy\CreateDownloadsTable;
-use Database\Migrations\Tenancy\CreateFlightsTable;
-use Database\Migrations\Tenancy\CreateEventsTable;
-use Database\Migrations\Tenancy\CreateIntraEmailTable;
-use Database\Migrations\Tenancy\CreateNotificationTable;
-use Database\Migrations\Tenancy\CreatePermissionsTable;
-use Database\Migrations\Tenancy\CreateScheduleFlightTable;
-use Database\Migrations\Tenancy\CreateToursTable;
+use Database\Migrations\Tenant\CreateIconsTable;
+use Database\Migrations\Tenant\CreateNetworksTable;
+use Database\Migrations\Tenant\CreateAircraftsTable;
+use Database\Migrations\Tenant\CreateAirlineTable;
+use Database\Migrations\Tenant\CreateRanksTable;
+use Database\Migrations\Tenant\CreateRolesTable;
+use Database\Migrations\Tenant\CreateReservedFlightsTable;
+use Database\Migrations\Tenant\CreateCharterFlightTable;
+use Database\Migrations\Tenant\CreateDownloadsTable;
+use Database\Migrations\Tenant\CreateFlightsTable;
+use Database\Migrations\Tenant\CreateEventsTable;
+use Database\Migrations\Tenant\CreateIntraEmailTable;
+use Database\Migrations\Tenant\CreateNotificationTable;
+use Database\Migrations\Tenant\CreatePermissionsTable;
+use Database\Migrations\Tenant\CreateScheduleFlightTable;
+use Database\Migrations\Tenant\CreateToursTable;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class DestroyTenancyDatabaseEstruxture extends Command
+class DestroyTenantDatabaseEstruxture extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'destroy:tenancyDb {tenancyId? : The tenancy id (optional)}';
+    protected $signature = 'destroy:tenantDb {tenantId? : The tenant id (optional)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Destroy a Database Exstructure for Tenancy';
+    protected $description = 'Destroy a Database Exstructure for Tenant';
 
     /**
      * The type of class being generated.
@@ -54,14 +54,14 @@ class DestroyTenancyDatabaseEstruxture extends Command
      */
     public function handle()
     {
-        $tenancyId = $this->argument('tenancyId');
+        $tenantId = $this->argument('tenantId');
 
-        if(empty($tenancyId)) {
-            $tenancyId = $this->ask('Please provide the tenancy ID');
+        if(empty($tenantId)) {
+            $tenantId = $this->ask('Please provide the tenant ID');
         }
 
-        if(!is_numeric($tenancyId) || $tenancyId <= 0) {
-            $this->error('The tenancy ID must be a positive integer.');
+        if(!is_numeric($tenantId) || $tenantId <= 0) {
+            $this->error('The tenant ID must be a positive integer.');
             return false;
         }
 
@@ -95,7 +95,7 @@ class DestroyTenancyDatabaseEstruxture extends Command
                 $startTime = microtime(true);
 
                 // Executa o rollback da migração
-                new $migration['class']($tenancyId)->down();
+                new $migration['class']($tenantId)->down();
 
                 $endTime = microtime(true);
                 $executionTime = ($endTime - $startTime) * 1000; // Converte para milissegundos
@@ -128,10 +128,10 @@ class DestroyTenancyDatabaseEstruxture extends Command
                 $counter++;
             }
 
-            $this->info('Tenancy database structure destroyed successfully.');
+            $this->info('Tenant database structure destroyed successfully.');
 
         } catch (\Exception $e) {
-            $this->error('Error Destroying Tenancy database structure: ' . $e->getMessage());
+            $this->error('Error Destroying Tenant database structure: ' . $e->getMessage());
             return false;
         }
 

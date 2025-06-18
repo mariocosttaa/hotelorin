@@ -14,7 +14,7 @@ class SubscriptionTryPayModel extends ManagerModelHelper
 
     protected $fillable = [
         'user_id',
-        'tenancy_id',
+        'tenant_id',
         'subscription_id',
         'subscription_price_id',
         'price',
@@ -35,7 +35,7 @@ class SubscriptionTryPayModel extends ManagerModelHelper
 
     protected $casts = [
         'user_id' => 'integer',
-        'tenancy_id' => 'integer',
+        'tenant_id' => 'integer',
         'subscription_id' => 'integer',
         'subscription_price_id' => 'integer',
         'price' => 'integer',
@@ -51,9 +51,9 @@ class SubscriptionTryPayModel extends ManagerModelHelper
     {
         return $this->belongsTo(UserModel::class, 'user_id');
     }
-    public function tenancy()
+    public function tenant()
     {
-        return $this->belongsTo(TenancyModel::class, 'tenancy_id');
+        return $this->belongsTo(TenantModel::class, 'tenant_id');
     }
     public function subscription()
     {

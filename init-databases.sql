@@ -1,7 +1,7 @@
 -- Create manager database
 CREATE DATABASE IF NOT EXISTS manager;
 
--- Create tenancy database
+-- Create tenant database
 CREATE DATABASE IF NOT EXISTS tenancies;
 
 -- Grant privileges to sail user for both databases

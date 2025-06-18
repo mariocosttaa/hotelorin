@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Console\Commands\Tenancy;
+namespace App\Console\Commands\Tenant;
 
-use App\Models\Manager\TenancyModel;
+use App\Models\Manager\TenantModel;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class MakeTenancyDatabaseEstruxture extends Command
+class MakeTenantDatabaseEstruxture extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:tenancyDb {tenancyId? : The tenancy id (optional)}';
+    protected $signature = 'make:tenantDb {tenantId? : The tenant id (optional)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a Database Exstructure for Tenancy';
+    protected $description = 'Create a Database Exstructure for Tenant';
 
     /**
      * The type of class being generated.
@@ -37,14 +37,14 @@ class MakeTenancyDatabaseEstruxture extends Command
      */
     public function handle()
     {
-        $tenancyId = $this->argument('tenancyId');
+        $tenantId = $this->argument('tenantId');
 
-        if(empty($tenancyId)) {
-            $tenancyId = $this->ask('Please provide the tenancy ID');
+        if(empty($tenantId)) {
+            $tenantId = $this->ask('Please provide the tenant ID');
         }
 
-        if(!is_numeric($tenancyId) || $tenancyId <= 0) {
-            $this->error('The tenancy ID must be a positive integer.');
+        if(!is_numeric($tenantId) || $tenantId <= 0) {
+            $this->error('The tenant ID must be a positive integer.');
             return false;
         }
 
@@ -78,7 +78,7 @@ class MakeTenancyDatabaseEstruxture extends Command
                 $startTime = microtime(true);
 
                 // Executa a migração
-                new $migration['class']($tenancyId)->up();
+                new $migration['class']($tenantId)->up();
 
                 $endTime = microtime(true);
                 $executionTime = ($endTime - $startTime) * 1000; // Converte para milissegundos
@@ -114,7 +114,7 @@ class MakeTenancyDatabaseEstruxture extends Command
             $this->info('All migrations completed successfully.');
 
         } catch (\Exception $e) {
-            $this->error('Error creating tenancy database structure: ' . $e->getMessage());
+            $this->error('Error creating tenant database structure: ' . $e->getMessage());
             return false;
         }
 

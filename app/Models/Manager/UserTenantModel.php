@@ -4,17 +4,17 @@ namespace App\Models\Manager;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
-class UserTenancyModel extends Model
+class UserTenantModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_tenancy';
+    protected $table = 'user_tenant';
 
     protected $fillable = [
         'user_id',
-        'tenancy_id',
+        'tenant_id',
         'status',
         'created_at',
         'updated_at',
@@ -26,14 +26,13 @@ class UserTenancyModel extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function tenancy()
+    public function tenant(): BelongsTo
     {
-        return $this->belongsTo(TenancyModel::class, 'tenancy_id');
+        return $this->belongsTo(TenantModel::class, 'tenant_id');
     }
 
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id');
     }
-
 }

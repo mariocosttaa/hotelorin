@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Models\Tenancy;
+namespace App\Models\Tenant;
 
+use App\Models\Manager\UserModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-abstract class _TenancyModelHelper extends Model
+abstract class _TenantModelHelper extends Model
 {
     protected $baseTable;
 
@@ -20,17 +21,17 @@ abstract class _TenancyModelHelper extends Model
         parent::__construct($attributes);
 
         // Determina o Id
-        if (config('tenancyId')) {
-            $tenancyId = config('tenancyId');
+        if (config('tenantId')) {
+            $tenantId = config('tenantId');
         } elseif (Auth::check()) {
-            $tenancyId = Auth::user()->tenancy_id;
+            $tenantId = Auth::user()->tenant_id;
         } else {
-            $tenancyId = null;
+            $tenantId = null;
         }
 
-        // Ajusta o nome da tabela se houver tenancyId e o prefixo ainda não estiver presente
-        if ($tenancyId && strpos($this->getTable(), $tenancyId . '_') !== 0) {
-            $this->setTable($tenancyId . '_' . $this->baseTable);
+        // Ajusta o nome da tabela se houver tenantId e o prefixo ainda não estiver presente
+        if ($tenantId && strpos($this->getTable(), $tenantId . '_') !== 0) {
+            $this->setTable($tenantId . '_' . $this->baseTable);
         }
     }
 }

@@ -12,7 +12,7 @@ class SubscriptionInvoiceModel extends ManagerModelHelper
 
     protected $table = 'subscription_invoices';
     protected $fillable = [
-        'tenancy_id',
+        'tenant_id',
         'payment_gateway_log_id',
         'subscription_id',
         'subscription_price_id',
@@ -29,7 +29,7 @@ class SubscriptionInvoiceModel extends ManagerModelHelper
     ];
 
     protected $casts = [
-        'tenancy_id' => 'integer',
+        'tenant_id' => 'integer',
         'payment_gateway_log_id' => 'integer',
         'subscription_id' => 'integer',
         'subscription_price_id' => 'integer',
@@ -47,9 +47,9 @@ class SubscriptionInvoiceModel extends ManagerModelHelper
 
     public $timestamps = true;
 
-    public function tenancy()
+    public function tenant()
     {
-        return $this->belongsTo(TenancyModel::class, 'tenancy_id');
+        return $this->belongsTo(TenantModel::class, 'tenant_id');
     }
     public function paymentGatewayLog()
     {
