@@ -33,6 +33,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->index()->name('user_tenant_user_id_foreign');
             $table->foreignId('tenant_id')->constrained('tenants')->onDelete('cascade')->index()->name('user_tenant_tenant_id_foreign');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
 
