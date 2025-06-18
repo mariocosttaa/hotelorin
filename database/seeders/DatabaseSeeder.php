@@ -8,6 +8,7 @@ use Database\Seeders\Manager\CurrencySeeder;
 use Database\Seeders\Manager\SubscriptionFeatureSeeder;
 use Database\Seeders\Manager\SubscriptionPriceSeeder;
 use Database\Seeders\Manager\SubscriptionSeeder;
+use Database\Seeders\Manager\TenantSeeder;
 use Database\Seeders\Manager\UserSeeder;
 use Illuminate\Database\Seeder;
 
@@ -24,7 +25,8 @@ class DatabaseSeeder extends Seeder
             CurrencySeeder::class,
             SubscriptionSeeder::class,
             SubscriptionPriceSeeder::class,
-            SubscriptionFeatureSeeder::class
+            SubscriptionFeatureSeeder::class,
+            TenantSeeder::class
         ]);
     }
 }

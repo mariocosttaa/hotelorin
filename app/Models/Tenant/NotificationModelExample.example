@@ -11,7 +11,7 @@ class NotificationModelExample extends _TenantModelHelper
 {
     use HasFactory;
 
-    protected $connection = 'tenancies';
+    protected $connection = 'tenants';
     protected $table = 'notifications_example';
     protected $baseTable = 'notifications';
 
