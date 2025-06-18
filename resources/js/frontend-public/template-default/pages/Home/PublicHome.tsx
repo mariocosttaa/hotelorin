@@ -1,6 +1,10 @@
 import { useTranslation } from "react-i18next";
 import PortalLayout from "../../layout/PublicLayout";
 
+interface PublicHomeProps {
+    hotel: string;
+}
+
 export default function PublicHome() {
     const { t: __ } = useTranslation(['static-text']);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Manager\TenantModel;
 use Inertia\Inertia;
 
 class PublicHomeController extends Controller
