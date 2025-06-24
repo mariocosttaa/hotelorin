@@ -6,6 +6,7 @@ use App\Models\Helpers\ManagerModelHelper;
 use App\Models\Tenant\RankModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserRankModel extends ManagerModelHelper
 {

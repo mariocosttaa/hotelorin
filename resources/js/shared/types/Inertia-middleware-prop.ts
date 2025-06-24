@@ -2,9 +2,14 @@ import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 import Currency from './model/currency';
 import { User } from './model/user';
+import { Tenant } from './model/Tenants';
+import Rank from './model/rank';
+import Sector from './model/sector';
 
 export interface Auth {
     user: User;
+    rank: Rank;
+    sector: Sector;
 }
 
 export interface BreadcrumbItem {
@@ -24,12 +29,11 @@ export interface NavItem {
     isActive?: boolean;
 }
 
-    
-
 export interface InertiaMiddlewareProps {
     tenantId?: string;
+    tenant: Tenant;
     locale: string;
-    currencies: Array<Currency>
+    currencies: Array<Currency>;
     default_currency: string;
     default_currency_id: string;
     name: string;
@@ -39,5 +43,3 @@ export interface InertiaMiddlewareProps {
     sidebarOpen: boolean;
     [key: string]: unknown;
 }
-
-

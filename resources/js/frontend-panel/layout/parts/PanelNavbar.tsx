@@ -34,7 +34,7 @@ export default function PanelNavbar({
   const [cloudStorageOpen, setCloudStorageOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const { t: __ } = useTranslation(['menu', 'static-text'])
-  const { auth } = usePage<InertiaMiddlewareProps>().props;
+  const { auth, tenant } = usePage<InertiaMiddlewareProps>().props;
 
   const panelRoute = routeLang('panel-index');
 
@@ -65,7 +65,7 @@ export default function PanelNavbar({
           <div className="flex flex-1 items-center justify-between min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <h1 className="text-lg sm:text-xl font-bold text-[#e2af04] truncate">
-                <span className="hidden sm:inline">{__('Hotelon Creative', { ns: 'static-text' })}</span>
+                <span className="hidden sm:inline">{ tenant.name }</span>
                 <span className="sm:hidden">{__('Hotelon', { ns: 'static-text' })}</span>
               </h1>
               <div className="hidden lg:flex items-center gap-2">

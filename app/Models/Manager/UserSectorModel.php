@@ -2,16 +2,13 @@
 
 namespace App\Models\Manager;
 
-use App\Models\Helpers\ManagerModelHelper;
 use App\Models\Tenant\SectorModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 
-class UserSectorModel extends ManagerModelHelper
+class UserSectorModel extends Model
 {
-    use HasFactory;
-
-    protected $table = 'user_sectors';
+    protected $connection = 'manager';
+    protected $table = 'user_sector';
 
     protected $fillable = [
         'user_id',
@@ -19,20 +16,13 @@ class UserSectorModel extends ManagerModelHelper
         'tenant_id',
     ];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(UserModel::class, 'user_id');
-    }
-
-    public function sector(): BelongsTo
+    public function sector()
     {
         return $this->belongsTo(SectorModel::class, 'sector_id');
     }
 
-    public function tenant(): BelongsTo
+    public function tenant()
     {
         return $this->belongsTo(TenantModel::class, 'tenant_id');
     }
-
-
 }

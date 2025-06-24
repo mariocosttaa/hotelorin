@@ -93,6 +93,25 @@ export function UserDropdown({ theme, setTheme, onOpenProfile, onOpenSettings, o
                                 {__('Since', { ns: 'static-text' })} {new Date(auth.user.created_at).toLocaleDateString()}
                             </p>
                         </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                                    {__('Rank', { ns: 'static-text' })}
+                                </span>
+                                <span className="text-xs font-medium text-foreground">
+                                    {auth.rank?.name || <span className="text-muted-foreground">—</span>}
+                                </span>
+                            </div>
+                            <div className="h-6 w-px bg-border/40 mx-2" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                                    {__('Sector', { ns: 'static-text' })}
+                                </span>
+                                <span className="text-xs font-medium text-foreground">
+                                    {auth.sector?.name || <span className="text-muted-foreground">—</span>}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/30" />

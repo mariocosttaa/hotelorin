@@ -47,7 +47,7 @@ return new class extends Migration
         });
 
         // user_sectors
-        Schema::create('user_sectors', function (Blueprint $table) {
+        Schema::create('user_sector', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->index('user_sectors_user_id_index');
             $table->foreignId('sector_id');
