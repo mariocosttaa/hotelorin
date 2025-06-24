@@ -3,24 +3,7 @@
 namespace App\Console\Commands\Tenant;
 
 use App\Models\Manager\TenantModel;
-
-use Database\Migrations\Tenant\CreateIconsTable;
-use Database\Migrations\Tenant\CreateNetworksTable;
-use Database\Migrations\Tenant\CreateAircraftsTable;
-use Database\Migrations\Tenant\CreateAirlineTable;
-use Database\Migrations\Tenant\CreateRanksTable;
-use Database\Migrations\Tenant\CreateRolesTable;
-use Database\Migrations\Tenant\CreateReservedFlightsTable;
-use Database\Migrations\Tenant\CreateCharterFlightTable;
-use Database\Migrations\Tenant\CreateDownloadsTable;
-use Database\Migrations\Tenant\CreateFlightsTable;
-use Database\Migrations\Tenant\CreateEventsTable;
-use Database\Migrations\Tenant\CreateIntraEmailTable;
-use Database\Migrations\Tenant\CreateNotificationTable;
-use Database\Migrations\Tenant\CreatePermissionsTable;
-use Database\Migrations\Tenant\CreateScheduleFlightTable;
-use Database\Migrations\Tenant\CreateToursTable;
-
+use App\Actions\Tenant\TenantTableStructure;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -31,7 +14,7 @@ class DestroyTenantDatabaseEstruxture extends Command
      *
      * @var string
      */
-    protected $signature = 'destroy:tenantDb {tenantId? : The tenant id (optional)}';
+    protected $signature = 'tenant:destroy {tenantId? : The tenant id (optional)}';
 
     /**
      * The console command description.
@@ -65,69 +48,24 @@ class DestroyTenantDatabaseEstruxture extends Command
             return false;
         }
 
-        // Exibe o cabeçalho
-        $this->info('Rolling back migrations.');
+        $this->outputHeader('Rolling back migrations.');
 
-        // Array de migrações em ordem reversa para rollback
-        $migrations = [
-            ['class' => CreateFlightsTable::class, 'name' => 'flights_table'],
-            ['class' => CreateEventsTable::class, 'name' => 'events_table'],
-            ['class' => CreateToursTable::class, 'name' => 'tours_table'],
-            ['class' => CreateNetworksTable::class, 'name' => 'networks_table'],
-            ['class' => CreateIconsTable::class, 'name' => 'icons_table'],
-            ['class' => CreateReservedFlightsTable::class, 'name' => 'reserved_flights_table'],
-            ['class' => CreateScheduleFlightTable::class, 'name' => 'schedule_flight_table'],
-            ['class' => CreateCharterFlightTable::class, 'name' => 'charter_flight_table'],
-            ['class' => CreateAircraftsTable::class, 'name' => 'aircrafts_table'],
-            ['class' => CreatePermissionsTable::class, 'name' => 'permissions_table'],
-            ['class' => CreateAirlineTable::class, 'name' => 'airline_table'],
-            ['class' => CreateRanksTable::class, 'name' => 'ranks_table'],
-            ['class' => CreateRolesTable::class, 'name' => 'roles_table'],
-            ['class' => CreateNotificationTable::class, 'name' => 'notification_table'],
-            ['class' => CreateIntraEmailTable::class, 'name' => 'intra_email_table'],
-            ['class' => CreateDownloadsTable::class, 'name' => 'downloads_table'],
-        ];
+        $migrations = array_reverse(TenantTableStructure::getMigrations());
 
         try {
             $counter = 1;
 
-            foreach ($migrations as $migration) {
+            foreach ($migrations as $migrationClass) {
+                $migrationName = sprintf('0001_01_00_%06d_%s', $counter, class_basename($migrationClass));
                 $startTime = microtime(true);
-
-                // Executa o rollback da migração
-                new $migration['class']($tenantId)->down();
-
-                $endTime = microtime(true);
-                $executionTime = ($endTime - $startTime) * 1000; // Converte para milissegundos
-
-                // Formata o nome da migração com padding
-                $migrationName = sprintf(
-                    '0001_01_00_%06d_%s',
-                    $counter,
-                    $migration['name']
-                );
-
-                // Cria os pontos para alinhamento
-                $dots = str_repeat('.', max(1, 120 - strlen($migrationName)));
-
-                // Formata o tempo de execução
-                if ($executionTime < 1000) {
-                    $timeFormatted = sprintf('%.2fms', $executionTime);
-                } else {
-                    $timeFormatted = sprintf('%.2fs', $executionTime / 1000);
-                }
-
-                // Exibe a linha formatada
-                $this->line(sprintf(
-                    '%s %s %s <info>DONE</info>',
-                    $migrationName,
-                    $dots,
-                    $timeFormatted
-                ));
-
+                $this->startMigration($migrationName);
+                (new $migrationClass($tenantId))->down();
+                $time = $this->getElapsedTime($startTime);
+                $this->completeMigration($migrationName, $time);
                 $counter++;
             }
 
+            $this->newLine();
             $this->info('Tenant database structure destroyed successfully.');
 
         } catch (\Exception $e) {
@@ -136,5 +74,38 @@ class DestroyTenantDatabaseEstruxture extends Command
         }
 
         return true;
+    }
+
+    private function outputHeader($message)
+    {
+        $this->newLine();
+        $this->components->info($message);
+        $this->newLine();
+    }
+
+    private function startMigration($migrationName)
+    {
+        $this->output->write("<fg=blue>INFO</> Rolling back $migrationName ");
+        $this->output->write(str_repeat('.', max(0, 70 - strlen($migrationName))));
+        $this->output->write(' ');
+    }
+
+    private function completeMigration($migrationName, $time)
+    {
+        $this->output->writeln("<fg=green>DONE</> ({$time})");
+    }
+
+    private function getElapsedTime($startTime)
+    {
+        $elapsed = microtime(true) - $startTime;
+        if ($elapsed < 1) {
+            return round($elapsed * 1000) . "ms";
+        } else if ($elapsed < 60) {
+            return round($elapsed, 2) . "s";
+        } else {
+            $minutes = floor($elapsed / 60);
+            $seconds = $elapsed % 60;
+            return "{$minutes}m " . round($seconds, 2) . "s";
+        }
     }
 }
