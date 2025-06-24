@@ -56,12 +56,12 @@ class UserPermissionAccessMiddleware
     {
 
         //verify by Rank
-        $rankLevel = $permissionPage->minimum_rank_level;
+        $accessByRankBool = $rankLevel >= $permissionPage->minimum_rank_level;
 
-        //verify by Permission User
+        //verify by Permission User if not have user customizon of permisssion, return verifiation by rank
         $permissionUser = PermissionUserModel::where('user_id', $userId)->where('permission_id', $permissionPage->id)->first();
         if (!$permissionUser) {
-            return $rankLevel;
+            return $accessByRankBool;
          }
 
         return $permissionUser->access;
