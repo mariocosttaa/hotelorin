@@ -27,7 +27,7 @@ class UserPermissionAccessMiddleware
 
 
         //Get User Rank of this Tenant
-        $userRank = UserRankModel::where('tenant_id', $tenantId)->first();
+        $userRank = UserRankModel::where('user_id', $userId)->where('tenant_id', $tenantId)->first();
         if (!$userRank) {
             abort(403, __('You dont Have Permission to access this page'));
         }
