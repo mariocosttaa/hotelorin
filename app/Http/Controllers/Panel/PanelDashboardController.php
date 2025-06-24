@@ -16,18 +16,6 @@ class PanelDashboardController extends Controller
      */
     public function __invoke(Request $request): \Inertia\Response
     {
-        // Get all tenants for the current user
-        $userId = Auth::user()->id;
-        $userTenant = UserTenantModel::with('tenant')->where('user_id', $userId)->get();
-        $userTenantsResource = [];
-
-        if($userTenant->count() > 0) {
-            $tenantsArray = $userTenant->pluck('tenant');
-            $userTenantsResource = TenantResource::collection($tenantsArray)->resolve();
-        }
-
-        return Inertia::render('frontend-panel/pages/Dashboard/PanelDashboard', [
-            'tenants' => $userTenantsResource
-        ]);
+        return Inertia::render('frontend-panel/pages/Dashboard/PanelDashboard');
     }
 }
