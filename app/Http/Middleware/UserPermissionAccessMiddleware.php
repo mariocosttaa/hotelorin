@@ -16,7 +16,7 @@ class UserPermissionAccessMiddleware
     public function handle(Request $request, Closure $next)
     {
 
-        $tenantId = $request->get('tenant')->id;
+        $tenantId = $request->get('tenant-model')->id;
         $userId = $request->user()->id;
 
         //Verify if the user has access to the tenant

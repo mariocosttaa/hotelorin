@@ -68,8 +68,9 @@ class HandleInertiaRequests extends Middleware
         $url = $request->url();
         $path = $request->path();
 
-        $tenantModel = $this->getTenant($request, $url, $path);
-        $tenantId = $tenantModel?->id;
+        $tenantGet = $this->getTenant($request, $url, $path);
+        $tenantModel = $tenantGet->model;
+        $tenantId = $tenantGet->idHashed;
 
         // Debug: Log the URL and extracted tenantId
         Log::info('HandleInertiaRequests - Full URL: ' . $url);
@@ -97,21 +98,20 @@ class HandleInertiaRequests extends Middleware
 
 
 
-    private function getTenant(request $request, string $url, string $path): TenantModel|null {
-        // Try multiple patterns to extract tenantId
+    private function getTenant(Request $request, string $url, string $path): object {
         if (preg_match('/\/panel\/([a-zA-Z0-9]+)\//', $url, $matches)) {
-            $tenantId = $matches[1];
+            $tenantIdHashed = $matches[1];
         } elseif (preg_match('/panel\/([a-zA-Z0-9]+)/', $path, $matches)) {
-            $tenantId = $matches[1];
+            $tenantIdHashed = $matches[1];
         } elseif (preg_match('/panel\/([a-zA-Z0-9]+)$/', $path, $matches)) {
-            $tenantId = $matches[1];
+            $tenantIdHashed = $matches[1];
         } else {
-            $tenantId = null;
+            $tenantIdHashed = null;
         }
 
         //Get Tenant
-        if($tenantId) {
-            $tenantId = EasyHashAction::decode($tenantId, 'tenant-id', 21);
+        if($tenantIdHashed) {
+            $tenantId = EasyHashAction::decode($tenantIdHashed, 'tenant-id', 21);
             $tenant = TenantModel::where('id', $tenantId)->first();
             if($tenant) {
                 config(['tenantId' => $tenantId]);
@@ -119,7 +119,10 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
-        return $tenant ?? null;
+        return (object ) [
+            'model' => $tenant ?? null,
+            'idHashed'  => $tenantIdHashed ?? null
+        ];
     }
 
 }
