@@ -19,10 +19,10 @@ class AuthenticatedSessionController extends Controller
     public function create(Request $request): Response|RedirectResponse
     {
         if ($request->user()) {
-            return redirect()->intended(route('dashboard', ['locale' => app()->getLocale()]));
+            return redirect()->intended(route('panel-dashboard', ['locale' => app()->getLocale()]));
         }
 
-        return Inertia::render('frontend-public/template-default/pages/Auth/Login', [
+        return Inertia::render('frontend-panel/pages/Login/PanelLogin', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
         ]);
@@ -42,7 +42,11 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended($request->redirect);
         }
 
-        return redirect()->intended(route('portal-virtual-airlines', ['locale' => app()->getLocale()]));
+        return redirect()->intended(
+            route('panel-index', [
+                'locale' => app()->getLocale(),
+            ]
+        ));
 
     }
 

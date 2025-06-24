@@ -45,6 +45,10 @@ class UserModel extends UserModelHelper
         return $this->name . ' ' . $this->surname;
     }
 
+    public function tenants() {
+      return $this->hasMany(UserTenantModel::class, 'user_id');
+    }
+
     public function country()
     {
         return $this->belongsTo(CountryModel::class, 'country_id');

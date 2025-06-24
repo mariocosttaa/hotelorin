@@ -13,6 +13,7 @@ use App\Models\Manager\CurrencyModel;
 use App\Models\Manager\UserModel;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 use Pest\ArchPresets\Custom;
 use Tighten\Ziggy\Ziggy;
@@ -64,9 +65,29 @@ class HandleInertiaRequests extends Middleware
         //requrest user
         $user = AuthCache::getUser($request);
 
+        //determine tenant id from url
+        $url = $request->url();
+        $path = $request->path();
+
+        // Try multiple patterns to extract tenantId
+        if (preg_match('/\/panel\/([a-zA-Z0-9]+)\//', $url, $matches)) {
+            $tenantId = $matches[1];
+        } elseif (preg_match('/panel\/([a-zA-Z0-9]+)/', $path, $matches)) {
+            $tenantId = $matches[1];
+        } elseif (preg_match('/panel\/([a-zA-Z0-9]+)$/', $path, $matches)) {
+            $tenantId = $matches[1];
+        } else {
+            $tenantId = null;
+        }
+
+        // Debug: Log the URL and extracted tenantId
+        Log::info('HandleInertiaRequests - Full URL: ' . $url);
+        Log::info('HandleInertiaRequests - Path: ' . $path);
+        Log::info('HandleInertiaRequests - TenantId: ' . ($tenantId ?? 'null'));
+
         return [
             ...parent::share($request),
-
+            'tenantId' => $tenantId,
             'locale' => app()->getLocale(),
             'currencies' => CurrencyResource::collection(CurrencyCacheModel::all())->resolve(),
             'default_currency' => $this->defaultCurrencyCode(),
