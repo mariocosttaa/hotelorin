@@ -19,6 +19,7 @@ Route::middleware('guest')->group(function () {
 
             //Login Page
             Route::get('/login', PainelLoginController::class)->name('panel-login');
+            
         });
     });
 });
