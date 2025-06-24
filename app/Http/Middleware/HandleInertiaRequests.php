@@ -8,8 +8,10 @@ use App\CustomCache\Auth\AuthCache;
 use App\CustomCache\CustomCacheAction;
 use App\CustomCache\Model\Manager\CurrencyCacheModel;
 use App\Http\Resources\Manager\CurrencyResource;
+use App\Http\Resources\Manager\TenantResource;
 use App\Http\Resources\Manager\UserResource;
 use App\Models\Manager\CurrencyModel;
+use App\Models\Manager\TenantModel;
 use App\Models\Manager\UserModel;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -61,14 +63,41 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-        //requrest user
-        $user = AuthCache::getUser($request);
 
         //determine tenant id from url
         $url = $request->url();
         $path = $request->path();
 
+        $tenantModel = $this->getTenant($request, $url, $path);
+        $tenantId = $tenantModel?->id;
+
+        // Debug: Log the URL and extracted tenantId
+        Log::info('HandleInertiaRequests - Full URL: ' . $url);
+        Log::info('HandleInertiaRequests - Path: ' . $path);
+        Log::info('HandleInertiaRequests - TenantId: ' . ($tenantId ?? 'null'));
+
+        return [
+            ...parent::share($request),
+            'tenantId' => $tenantId,
+            'tenant' => $tenantModel ? new TenantResource($tenantModel)->resolve() : null,
+            'locale' => app()->getLocale(),
+            'currencies' => CurrencyResource::collection(CurrencyCacheModel::all())->resolve(),
+            'default_currency' => $this->defaultCurrencyCode(),
+            'name' => config('app.name'),
+            'auth' => [
+                'user' => AuthCache::getUser($request)
+            ],
+            'ziggy' => fn (): array => [
+                ...(new Ziggy)->toArray(),
+                'location' => $request->url(),
+            ],
+            'toast' => fn () => $request->session()->get('toast'),
+        ];
+    }
+
+
+
+    private function getTenant(request $request, string $url, string $path): TenantModel|null {
         // Try multiple patterns to extract tenantId
         if (preg_match('/\/panel\/([a-zA-Z0-9]+)\//', $url, $matches)) {
             $tenantId = $matches[1];
@@ -80,28 +109,17 @@ class HandleInertiaRequests extends Middleware
             $tenantId = null;
         }
 
-        // Debug: Log the URL and extracted tenantId
-        Log::info('HandleInertiaRequests - Full URL: ' . $url);
-        Log::info('HandleInertiaRequests - Path: ' . $path);
-        Log::info('HandleInertiaRequests - TenantId: ' . ($tenantId ?? 'null'));
+        //Get Tenant
+        if($tenantId) {
+            $tenantId = EasyHashAction::decode($tenantId, 'tenant-id', 21);
+            $tenant = TenantModel::where('id', $tenantId)->first();
+            if($tenant) {
+                config(['tenantId' => $tenantId]);
+                $request->merge(['tenant-model' => $tenant]);
+            }
+        }
 
-        return [
-            ...parent::share($request),
-            'tenantId' => $tenantId,
-            'locale' => app()->getLocale(),
-            'currencies' => CurrencyResource::collection(CurrencyCacheModel::all())->resolve(),
-            'default_currency' => $this->defaultCurrencyCode(),
-            'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth' => [
-                'user' => $user
-            ],
-            'ziggy' => fn (): array => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
-            ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'toast' => fn () => $request->session()->get('toast'),
-        ];
+        return $tenant ?? null;
     }
+
 }

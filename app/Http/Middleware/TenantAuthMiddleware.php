@@ -15,23 +15,19 @@ class TenantAuthMiddleware
     {
 
         $tenantId = $request->route('tenantId');
-
         if (!$tenantId) {
             abort(404, 'Tenant not found');
         }
 
-        //Decoded the tenant id
-        $tenantId = EasyHashAction::decode($tenantId, 'tenant-id', 21);
-
-        $tenant = TenantModel::find($tenantId);
-        if (!$tenant) {
+        $tenantModel = $request->get('tenant-model');
+        if (!$tenantModel) {
             abort(404);
         }
 
-        config(['tenantId' => $tenantId]);
+        config(['tenantId' => $tenantModel->id]);
 
         // Share tenant ID with request
-        $request->merge(['tenant' => $tenant]);
+        $request->merge(['tenant' => $tenantModel]);
         return $next($request);
     }
 }
