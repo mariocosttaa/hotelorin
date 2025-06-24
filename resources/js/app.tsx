@@ -3,7 +3,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import './shared/lang/i18n';
 import { CurrencyProvider } from './shared/context/CurrencyContext';
-import { ToastProvider } from './shared/components/ToastProvider';
+import DefaultToastProvider from './shared/components/DefaultToastProvider';
 
 const appName = import.meta.env.VITE_APP_NAME;
 
@@ -17,9 +17,9 @@ createInertiaApp({
             <App {...props}>
                 {({ Component, key, props }) => (
                     <CurrencyProvider>
-                        <ToastProvider>
+                        <DefaultToastProvider>
                             <Component key={key} {...props} />
-                        </ToastProvider>
+                        </DefaultToastProvider>
                     </CurrencyProvider>
                 )}
             </App>

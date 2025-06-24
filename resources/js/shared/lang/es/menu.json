@@ -3,10 +3,16 @@
     "About": "Acerca de",
     "Features": "Características",
     "Integrations": "Integraciones",
+    "Pricing": "Precios",
     "Contact": "Contacto",
+    "Virtual Airlines": "Aerolíneas Virtuales",
     "Blog": "Blog",
-    "For Business": "Para empresas",
-    "Dashboard": "Tablero",
-    "Log In": "Iniciar sesión",
-    "Pricing": "Precios"
+    "For Business": "Para Empresas",
+    "Dashboard": "Panel",
+    "Log In": "Iniciar Sesión",
+    "Logout": "Cerrar Sesión",
+    "Invoices": "Facturas",
+    "Profile": "Perfil",
+    "Settings": "Configuración",
+    "Select Hotel": "Seleccionar Hotel"
 }

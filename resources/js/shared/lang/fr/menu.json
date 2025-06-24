@@ -1,13 +1,18 @@
 {
-
     "Home": "Accueil",
     "About": "À propos",
     "Features": "Fonctionnalités",
     "Integrations": "Intégrations",
+    "Pricing": "Tarifs",
     "Contact": "Contact",
+    "Virtual Airlines": "Compagnies Virtuelles",
     "Blog": "Blog",
-    "For Business": "Pour les entreprises",
-    "Dashboard": "Tableau de bord",
-    "Log In": "Se connecter",
-    "Pricing": "Tarification"
+    "For Business": "Pour Entreprises",
+    "Dashboard": "Tableau de Bord",
+    "Log In": "Se Connecter",
+    "Logout": "Se Déconnecter",
+    "Invoices": "Factures",
+    "Profile": "Profil",
+    "Settings": "Paramètres",
+    "Select Hotel": "Sélectionner l'Hôtel"
 }

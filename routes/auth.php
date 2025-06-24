@@ -8,8 +8,10 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Panel\PainelLoginController;
 use App\Http\Middleware\SetLocaleMiddleware;
 use Illuminate\Support\Facades\Route;
+
 
 
 // Aplica middleware de localização para todas as rotas
@@ -18,9 +20,8 @@ Route::middleware(SetLocaleMiddleware::class)->group(function () {
     Route::prefix('{locale}')->group(function () {
 
         //login
-        Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('public-login');
-        Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('public-login');
-        Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login');
+        Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('auth-lang-login');
+        Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('auth-lang-login');
 
     });
 });
@@ -30,9 +31,11 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);  
+    Route::post('register', [RegisteredUserController::class, 'store']);
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::get('login', function(){
+        return redirect()->route('auth-lang-login', ['locale' => 'en']);
+    })->name('login');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

@@ -5,7 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import { type RouteName, route } from 'ziggy-js';
 import i18n from './shared/lang/i18n';
 import { CurrencyProvider } from './shared/context/CurrencyContext';
-import { ToastProvider } from './shared/components/ToastProvider';
+import DefaultToastProvider from './shared/components/DefaultToastProvider';
 import { determineCSSByUrl } from './shared/utils/cssLoader';
 
 const appName = import.meta.env.VITE_APP_NAME;
@@ -62,9 +62,9 @@ createServer(async (page: any) => {
 
             return (
                 <CurrencyProvider>
-                    <ToastProvider>
+                    <DefaultToastProvider>
                         <App {...props} />
-                    </ToastProvider>
+                    </DefaultToastProvider>
                 </CurrencyProvider>
             )
         },

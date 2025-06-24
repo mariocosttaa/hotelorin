@@ -11,6 +11,49 @@
     "Month": "Mois",
     "Year": "Année",
     "Currency": "Devise",
+    "Select": "Sélectionner",
+    "Login": "Se connecter",
+    "Register": "S'inscrire",
+    "Website": "Site web",
+
+    "Grand Palace Hotel": "Grand Palace Hotel",
+    "Home": "Accueil",
+    "Rooms": "Chambres",
+    "Amenities": "Équipements",
+    "Contact": "Contact",
+    "Hotel": "Hôtel",
+    "Room": "Chambre",
+    "Booking": "Réservation",
+    "Reservation": "Réservation",
+    "Check-in": "Arrivée",
+    "Check-out": "Départ",
+    "Guests": "Clients",
+    "Search Rooms": "Rechercher des Chambres",
+    "Hotel Amenities": "Équipements de l'Hôtel",
+    "Available Rooms": "Chambres Disponibles",
+    "View All Rooms": "Voir Toutes les Chambres",
+    "Book Now": "Réserver Maintenant",
+    "per night": "par nuit",
+    "Up to": "Jusqu'à",
+    "guests": "clients",
+    "Hotel Gallery": "Galerie de l'Hôtel",
+    "What our guests say": "Ce que disent nos clients",
+    "Free WiFi": "WiFi Gratuit",
+    "Parking": "Parking",
+    "Restaurant": "Restaurant",
+    "Fitness Center": "Centre de Fitness",
+    "Spa & Wellness": "Spa & Bien-être",
+    "Swimming Pool": "Piscine",
+    "24h Concierge": "Conciergerie 24h",
+    "Business Center": "Centre d'Affaires",
+    "About Hotel": "À propos de l'Hôtel",
+    "About Hotel Text": "Le Grand Palace Hotel offre une expérience unique de luxe et de confort, avec plus de 50 ans de tradition dans l'hospitalité.",
+    "Quick Links": "Liens Rapides",
+    "Follow Us": "Suivez-nous",
+    "Newsletter": "Newsletter",
+    "Subscribe to receive exclusive offers": "Abonnez-vous pour recevoir des offres exclusives",
+    "Subscribe": "S'abonner",
+    "All rights reserved.": "Tous droits réservés.",
 
     "Boost Your Virtual Pilots Experience": "Améliorez votre expérience de pilotes virtuels",
     "Most powerful System to": "Système le plus puissant pour",
@@ -49,6 +92,94 @@
     "Create Company": "Créer une entreprise",
     "Start your virtual airline today": "Démarrez votre compagnie aérienne virtuelle aujourd'hui",
     "no hidden fees": "aucun frais caché",
-    "Popular": "Populaire"
+    "Popular": "Populaire",
 
+    "Theme": "Thème",
+    "Light": "Clair",
+    "Dark": "Sombre",
+    "System": "Système",
+    "Language": "Langue",
+    "English": "Anglais",
+    "Portuguese": "Portugais",
+    "Spanish": "Espagnol",
+    "French": "Français",
+    "Help & Support": "Aide & Support",
+    "Privacy & Security": "Confidentialité & Sécurité",
+    "Pro": "Pro",
+    "Online": "En ligne",
+    "Hotelon Creative": "Hotelon Créatif",
+    "Hotelon": "Hotelon",
+    "Since": "Depuis",
+
+    "Contact us": "Contactez-nous !",
+    "Unavailable": "Indisponible",
+    "Manage your hotel easily and efficiently!": "Gérez votre hôtel facilement et efficacement !",
+    "Our system allows you to manage reservations, rooms, guests, and hotel services quickly, with control and automation. Simplify management and focus on what matters: your guests experience.": "Notre système vous permet de gérer rapidement les réservations, les chambres, les clients et les services de votre hôtel, avec contrôle et automatisation. Simplifiez la gestion et concentrez-vous sur l'essentiel : l'expérience de vos clients.",
+    "Complete reservation management": "Gestion complète des réservations",
+    "Control reservations, check-ins, check-outs, and availability in real time.": "Contrôlez les réservations, les arrivées, les départs et la disponibilité en temps réel.",
+    "Task automation": "Automatisation des tâches",
+    "Send confirmations, reminders, and reports automatically to guests and staff.": "Envoyez automatiquement des confirmations, des rappels et des rapports aux clients et au personnel.",
+    "Team and service management": "Gestion de l'équipe et des services",
+    "Assign tasks, control services, and keep your team organized.": "Attribuez des tâches, contrôlez les services et gardez votre équipe organisée.",
+    "Easy and secure access": "Accès facile et sécurisé",
+    "Manage everything online, securely and accessible from anywhere.": "Gérez tout en ligne, en toute sécurité et accessible de partout.",
+
+    "panel": {
+        "user": {
+            "admin": "Administrateur"
+        },
+        "logout": {
+            "button": "Se déconnecter",
+            "success": "Déconnexion réussie",
+            "error": "Une erreur s'est produite lors de la déconnexion"
+        },
+        "navigation": {
+            "back": "Retour",
+            "back_error": "Impossible de revenir en arrière"
+        },
+        "hotels": {
+            "title": "Vos Propriétés",
+            "subtitle": "Sélectionnez une propriété pour accéder à son tableau de bord de gestion",
+            "status": {
+                "active": "Actif",
+                "inactive": "Inactif"
+            },
+            "notifications": {
+                "new": "3 nouveaux"
+            },
+            "enter": {
+                "button": "Entrer",
+                "loading": "Entrée en cours..."
+            }
+        },
+        "loading": {
+            "preparing": "Préparation de votre expérience...",
+            "accessing": "Accès au tableau de bord de la propriété...",
+            "skip": "Passer"
+        },
+        "access": {
+            "success": "Accès réussi au tableau de bord de la propriété",
+            "error": "Impossible d'accéder au tableau de bord de la propriété",
+            "permission_error": "Vous n'avez pas l'autorisation d'accéder à cette propriété"
+        }
+    },
+
+    "Admin": "Administrateur",
+    "Logout": "Se déconnecter",
+    "Your Hotels": "Vos Hôtels",
+    "Select a hotel to access its management dashboard": "Sélectionnez un hôtel pour accéder à son tableau de bord de gestion",
+    "Active": "Actif",
+    "Inactive": "Inactif",
+    "3 new": "3 nouveaux",
+    "Entering...": "Entrée en cours...",
+    "Enter": "Entrer",
+    "An error occurred during logout": "Une erreur s'est produite lors de la déconnexion",
+    "Successfully logged out": "Déconnexion réussie",
+    "You do not have permission to access this hotel": "Vous n'avez pas l'autorisation d'accéder à cet hôtel",
+    "Unable to access hotel dashboard": "Impossible d'accéder au tableau de bord de l'hôtel",
+    "Successfully accessed hotel dashboard": "Accès réussi au tableau de bord de l'hôtel",
+    "Unable to go back": "Impossible de revenir en arrière",
+    "Preparing your experience...": "Préparation de votre expérience...",
+    "Accessing hotel dashboard...": "Accès au tableau de bord de l'hôtel...",
+    "Skip": "Passer"
 }

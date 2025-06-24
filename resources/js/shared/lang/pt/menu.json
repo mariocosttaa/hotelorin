@@ -1,20 +1,21 @@
 {
 
-    "Home": "Inicio",
+    "Home": "Início",
     "About": "Sobre",
     "Features": "Funcionalidades",
-    "Integrations": "Integracões",
+    "Integrations": "Integrações",
     "Pricing": "Preços",
     "Contact": "Contacto",
     "Virtual Airlines": "Companhias Virtuais",
 
     "Blog": "Blog",
     "For Business": "Para Empresas",
-    "Dashboard": "Dashboard",
-    "Log In": "Iniciar Sessão",
+    "Dashboard": "Painel",
+    "Log In": "Entrar",
     "Logout": "Sair",
     "Invoices": "Faturas",
     "Profile": "Perfil",
-    "Settings": "Configurações"
+    "Settings": "Definições",
+    "Select Hotel": "Selecionar Hotel"
 
 }

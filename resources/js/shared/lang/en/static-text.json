@@ -17,7 +17,44 @@
     "Register": "Register",
     "Website": "Website",
 
-
+    "Grand Palace Hotel": "Grand Palace Hotel",
+    "Home": "Home",
+    "Rooms": "Rooms",
+    "Amenities": "Amenities",
+    "Contact": "Contact",
+    "Hotel": "Hotel",
+    "Room": "Room",
+    "Booking": "Booking",
+    "Reservation": "Reservation",
+    "Check-in": "Check-in",
+    "Check-out": "Check-out",
+    "Guests": "Guests",
+    "Search Rooms": "Search Rooms",
+    "Hotel Amenities": "Hotel Amenities",
+    "Available Rooms": "Available Rooms",
+    "View All Rooms": "View All Rooms",
+    "Book Now": "Book Now",
+    "per night": "per night",
+    "Up to": "Up to",
+    "guests": "guests",
+    "Hotel Gallery": "Hotel Gallery",
+    "What our guests say": "What our guests say",
+    "Free WiFi": "Free WiFi",
+    "Parking": "Parking",
+    "Restaurant": "Restaurant",
+    "Fitness Center": "Fitness Center",
+    "Spa & Wellness": "Spa & Wellness",
+    "Swimming Pool": "Swimming Pool",
+    "24h Concierge": "24h Concierge",
+    "Business Center": "Business Center",
+    "About Hotel": "About Hotel",
+    "About Hotel Text": "Grand Palace Hotel offers a unique experience of luxury and comfort, with over 50 years of tradition in hospitality.",
+    "Quick Links": "Quick Links",
+    "Follow Us": "Follow Us",
+    "Newsletter": "Newsletter",
+    "Subscribe to receive exclusive offers": "Subscribe to receive exclusive offers",
+    "Subscribe": "Subscribe",
+    "All rights reserved.": "All rights reserved.",
 
     "Boost Your Virtual Pilots Experience": "Boost Your Virtual Pilots Experience",
     "Most powerful System to": "Most powerful System to",
@@ -112,10 +149,94 @@
     "Online Pilots": "Online Pilots",
     "Last Flight": "Last Flight",
     "Join": "Join",
-    "New Company": "New Company"
+    "New Company": "New Company",
 
+    "Theme": "Theme",
+    "Light": "Light",
+    "Dark": "Dark",
+    "System": "System",
+    "Language": "Language",
+    "English": "English",
+    "Portuguese": "Portuguese",
+    "Spanish": "Spanish",
+    "French": "French",
+    "Help & Support": "Help & Support",
+    "Privacy & Security": "Privacy & Security",
+    "Pro": "Pro",
+    "Online": "Online",
+    "Hotelon Creative": "Hotelon Creative",
+    "Hotelon": "Hotelon",
+    "Since": "Since",
 
+    "Contact us": "Contact us",
+    "Unavailable": "Unavailable",
+    "Manage your hotel easily and efficiently!": "Manage your hotel easily and efficiently!",
+    "Our system allows you to manage reservations, rooms, guests, and hotel services quickly, with control and automation. Simplify management and focus on what matters: your guests experience.": "Our system allows you to manage reservations, rooms, guests, and hotel services quickly, with control and automation. Simplify management and focus on what matters: your guests experience.",
+    "Complete reservation management": "Complete reservation management",
+    "Control reservations, check-ins, check-outs, and availability in real time.": "Control reservations, check-ins, check-outs, and availability in real time.",
+    "Task automation": "Task automation",
+    "Send confirmations, reminders, and reports automatically to guests and staff.": "Send confirmations, reminders, and reports automatically to guests and staff.",
+    "Team and service management": "Team and service management",
+    "Assign tasks, control services, and keep your team organized.": "Assign tasks, control services, and keep your team organized.",
+    "Easy and secure access": "Easy and secure access",
+    "Manage everything online, securely and accessible from anywhere.": "Manage everything online, securely and accessible from anywhere.",
 
+    "panel": {
+        "user": {
+            "admin": "Administrator"
+        },
+        "logout": {
+            "button": "Logout",
+            "success": "Successfully logged out",
+            "error": "An error occurred during logout"
+        },
+        "navigation": {
+            "back": "Back",
+            "back_error": "Unable to go back"
+        },
+        "hotels": {
+            "title": "Your Properties",
+            "subtitle": "Select a property to access its management dashboard",
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "notifications": {
+                "new": "3 new"
+            },
+            "enter": {
+                "button": "Enter",
+                "loading": "Entering..."
+            }
+        },
+        "loading": {
+            "preparing": "Preparing your experience...",
+            "accessing": "Accessing property dashboard...",
+            "skip": "Skip"
+        },
+        "access": {
+            "success": "Successfully accessed property dashboard",
+            "error": "Unable to access property dashboard",
+            "permission_error": "You do not have permission to access this property"
+        }
+    },
 
-
+    "Admin": "Admin",
+    "Logout": "Logout",
+    "Your Hotels": "Your Hotels",
+    "Select a hotel to access its management dashboard": "Select a hotel to access its management dashboard",
+    "Active": "Active",
+    "Inactive": "Inactive",
+    "3 new": "3 new",
+    "Entering...": "Entering...",
+    "Enter": "Enter",
+    "An error occurred during logout": "An error occurred during logout",
+    "Successfully logged out": "Successfully logged out",
+    "You do not have permission to access this hotel": "You do not have permission to access this hotel",
+    "Unable to access hotel dashboard": "Unable to access hotel dashboard",
+    "Successfully accessed hotel dashboard": "Successfully accessed hotel dashboard",
+    "Unable to go back": "Unable to go back",
+    "Preparing your experience...": "Preparing your experience...",
+    "Accessing hotel dashboard...": "Accessing hotel dashboard...",
+    "Skip": "Skip"
 }

@@ -24,9 +24,10 @@ export interface NavItem {
     isActive?: boolean;
 }
 
-
+    
 
 export interface InertiaMiddlewareProps {
+    tenantId?: string;
     locale: string;
     currencies: Array<Currency>
     default_currency: string;

@@ -5,7 +5,7 @@ use App\Http\Controllers\Public\PublicHotelController;
 use App\Http\Middleware\SetLocaleMiddleware;
 use Illuminate\Support\Facades\Route;
 
-// home
+// Home
 Route::get('/', PublicHomeController::class)->name('public-home');
 
 // Aplica middleware de localização para todas as rotas
