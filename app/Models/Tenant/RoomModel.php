@@ -41,62 +41,94 @@ class RoomModel extends TenantModelHelper
 
     public $timestamps = true;
 
-    public function roomComodites(): BelongsToMany
-    {
-        return $this->belongsToMany(RoomComoditeModel::class, 'room_id');
-    }
-
     public function getOverviewNameAttribute(): string
     {
         $lang = app()->getLocale();
-        switch ($lang) {
-            case 'en':
-                return $this->overview_name_en ?? $this->overview_name_pt ?? $this->overview_name_es ?? $this->overview_name_fr;
-            case 'es':
-                return $this->overview_name_es ?? $this->overview_name_pt ?? $this->overview_name_en ?? $this->overview_name_fr;
-            case 'fr':
-                return $this->overview_name_fr ?? $this->overview_name_pt ?? $this->overview_name_en ?? $this->overview_name_es;
-            case 'pt':
-            default:
-                return $this->overview_name_en ?? $this->overview_name_pt ?? $this->overview_name_es ?? $this->overview_name_fr;
-        }
+        return $this->{"overview_name_$lang"} ?? $this->overview_name_en ?? $this->overview_name_pt ?? $this->overview_name_es ?? $this->overview_name_fr;
     }
 
     public function getOverviewDescriptionAttribute(): string
     {
         $lang = app()->getLocale();
-        switch ($lang) {
-            case 'en':
-                return $this->overview_description_en ?? $this->overview_description_pt ?? $this->overview_description_es ?? $this->overview_description_fr;
-            case 'es':
-                return $this->overview_description_es ?? $this->overview_description_pt ?? $this->overview_description_en ?? $this->overview_description_fr;
-            case 'fr':
-                return $this->overview_description_fr ?? $this->overview_description_pt ?? $this->overview_description_en ?? $this->overview_description_es;
-            case 'pt':
-            default:
-                return $this->overview_description_en ?? $this->overview_description_pt ?? $this->overview_description_es ?? $this->overview_description_fr;
-        }
+        return $this->{"overview_description_$lang"} ?? $this->overview_description_en ?? $this->overview_description_pt ?? $this->overview_description_es ?? $this->overview_description_fr;
     }
 
     public function getOverviewSlugAttribute(): string
     {
         $lang = app()->getLocale();
-        switch ($lang) {
-            case 'en':
-                return $this->overview_slug_en ?? $this->overview_slug_pt ?? $this->overview_slug_es ?? $this->overview_slug_fr;
-            case 'es':
-                return $this->overview_slug_es ?? $this->overview_slug_pt ?? $this->overview_slug_en ?? $this->overview_slug_fr;
-            case 'fr':
-                return $this->overview_slug_fr ?? $this->overview_slug_pt ?? $this->overview_slug_en ?? $this->overview_slug_es;
-            case 'pt':
-            default:
-                return $this->overview_slug_en ?? $this->overview_slug_pt ?? $this->overview_slug_es ?? $this->overview_slug_fr;
-        }
+        return $this->{"overview_slug_$lang"} ?? $this->overview_slug_en ?? $this->overview_slug_pt ?? $this->overview_slug_es ?? $this->overview_slug_fr;
     }
 
-    public function roomType(): BelongsTo
+    public function getNameAttribute(): string
+    {
+        if (!$this->type) {
+            return "Room #{$this->id}";
+        }
+
+        $lang = app()->getLocale();
+        $nameField = "name_$lang";
+
+        // Try to get name from room type based on current locale
+        if (isset($this->type->$nameField) && !empty($this->type->$nameField)) {
+            return $this->type->$nameField;
+        }
+
+        // Fallback to other languages in order of preference
+        $fallbackLanguages = ['en', 'pt', 'es', 'fr'];
+        foreach ($fallbackLanguages as $fallbackLang) {
+            $fallbackField = "name_$fallbackLang";
+            if (isset($this->type->$fallbackField) && !empty($this->type->$fallbackField)) {
+                return $this->type->$fallbackField;
+            }
+        }
+
+        return "Room #{$this->id}";
+    }
+
+    public function getDescriptionAttribute(): string
+    {
+        if (!$this->type) {
+            return '';
+        }
+
+        $lang = app()->getLocale();
+        $descField = "description_$lang";
+
+        // Try to get description from room type based on current locale
+        if (isset($this->type->$descField) && !empty($this->type->$descField)) {
+            return $this->type->$descField;
+        }
+
+        // Fallback to other languages in order of preference
+        $fallbackLanguages = ['en', 'pt', 'es', 'fr'];
+        foreach ($fallbackLanguages as $fallbackLang) {
+            $fallbackField = "description_$fallbackLang";
+            if (isset($this->type->$fallbackField) && !empty($this->type->$fallbackField)) {
+                return $this->type->$fallbackField;
+            }
+        }
+
+        return '';
+    }
+
+    public function comodites(): HasMany
+    {
+        return $this->hasMany(RoomComoditeModel::class, 'room_id');
+    }
+
+    public function type(): BelongsTo
     {
         return $this->belongsTo(RoomTypeModel::class, 'room_type_id');
+    }
+
+    public function galleries(): HasMany
+    {
+        return $this->hasMany(RoomGalleryModel::class, 'room_id');
+    }
+
+    public function prices(): HasMany
+    {
+        return $this->hasMany(RoomPriceModel::class, 'room_id');
     }
 
 }

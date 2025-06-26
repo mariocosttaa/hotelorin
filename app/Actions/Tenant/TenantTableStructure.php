@@ -18,6 +18,7 @@ class TenantTableStructure
             \Database\Migrations\Tenant\CreateAttachmentTable::class,
             \Database\Migrations\Tenant\CreateRoomTypeTable::class,
             \Database\Migrations\Tenant\CreateRoomTable::class,
+            \Database\Migrations\Tenant\CreateComoditeTable::class,
             \Database\Migrations\Tenant\CreateRoomComoditesTable::class,
             \Database\Migrations\Tenant\CreateRoomGalleryTable::class,
             \Database\Migrations\Tenant\CreateRoomPriceTable::class,

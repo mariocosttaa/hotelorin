@@ -31,12 +31,7 @@ class SubscriptionFeatureModel extends ManagerModelHelper
     public $timestamps = true;
 
     public function getNameAttribute() {
-        return match (app()->getLocale()) {
-            'en' => $this->name_en,
-            'es' => $this->name_es,
-            'fr' => $this->name_fr,
-            'pt' => $this->name_pt,
-            default => $this->name_en,
-        };
+        $lang = app()->getLocale();
+        return $this->{"name_$lang"} ?? $this->name_en ?? $this->name_pt ?? $this->name_es ?? $this->name_fr;
     }
 }

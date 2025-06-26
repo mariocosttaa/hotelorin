@@ -13,48 +13,25 @@ class RoomComoditeModel extends TenantModelHelper
     protected $table = 'room_comodites';
     protected $baseTable = 'room_comodites';
     protected $fillable = [
-        'icon',
-        'name_pt',
-        'name_en',
-        'name_es',
-        'name_fr',
-        'description_pt',
-        'description_en',
-        'description_es',
-        'description_fr',
+        'comodite_id',
+        'room_type_id',
+        'room_id',
     ];
 
     public $timestamps = true;
 
-    public function getNameAttribute(): string
+    public function comodite(): BelongsTo
     {
-        $lang = app()->getLocale();
-        switch ($lang) {
-            case 'en':
-                return $this->name_en ?? $this->name_pt ?? $this->name_es ?? $this->name_fr;
-            case 'es':
-                return $this->name_es ?? $this->name_pt ?? $this->name_en ?? $this->name_fr;
-            case 'fr':
-                return $this->name_fr ?? $this->name_pt ?? $this->name_en ?? $this->name_es;
-            case 'pt':
-            default:
-                return $this->name_en ?? $this->name_pt ?? $this->name_es ?? $this->name_fr;
-        }
+        return $this->belongsTo(ComoditeModel::class, 'comodite_id');
     }
 
-    public function getDescriptionAttribute(): string
+    public function roomType(): BelongsTo
     {
-        $lang = app()->getLocale();
-        switch ($lang) {
-            case 'en':
-                return $this->description_en ?? $this->description_pt ?? $this->description_es ?? $this->description_fr;
-            case 'es':
-                return $this->description_es ?? $this->description_pt ?? $this->description_en ?? $this->description_fr;
-            case 'fr':
-                return $this->description_fr ?? $this->description_pt ?? $this->description_en ?? $this->description_es;
-            case 'pt':
-            default:
-                return $this->description_en ?? $this->description_pt ?? $this->description_es ?? $this->description_fr;
-        }
+        return $this->belongsTo(RoomTypeModel::class, 'room_type_id');
+    }
+
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(RoomModel::class, 'room_id');
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Manager\CurrencyModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Helpers\TenantModelHelper;
+use App\Actions\General\MoneyAction;
 
 class RoomPriceModel extends TenantModelHelper
 {
@@ -14,6 +15,8 @@ class RoomPriceModel extends TenantModelHelper
     protected $table = 'room_prices';
     protected $baseTable = 'room_prices';
     protected $fillable = [
+        'room_id',
+        'room_type_id',
         'price',
         'price_ilustrative',
         'currency_code',
@@ -21,6 +24,29 @@ class RoomPriceModel extends TenantModelHelper
     ];
 
     public $timestamps = true;
+
+    public function getPriceFormattedAttribute(): string
+    {
+        return MoneyAction::format($this->price, null, $this->currency_code, true) ?? '0';
+    }
+
+    public function getPriceIlustrativeFormattedAttribute(): ?string
+    {
+        if (!$this->price_ilustrative) {
+            return null;
+        }
+        return MoneyAction::format($this->price_ilustrative, null, $this->currency_code, true);
+    }
+
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(RoomModel::class, 'room_id', 'id');
+    }
+
+    public function roomType(): BelongsTo
+    {
+        return $this->belongsTo(RoomTypeModel::class, 'room_type_id', 'id');
+    }
 
     public function currency(): BelongsTo
     {

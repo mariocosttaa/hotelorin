@@ -41,13 +41,8 @@ class SubscriptionModel extends ManagerModelHelper
     public $timestamps = true;
 
     public function getDescriptionAttribute() {
-        return match (app()->getLocale()) {
-            'en' => $this->description_en,
-            'es' => $this->description_es,
-            'fr' => $this->description_fr,
-            'pt' => $this->description_pt,
-            default => $this->description_en,
-        };
+        $lang = app()->getLocale();
+        return $this->{"description_$lang"} ?? $this->description_en ?? $this->description_pt ?? $this->description_es ?? $this->description_fr;
     }
 
     public function prices()
