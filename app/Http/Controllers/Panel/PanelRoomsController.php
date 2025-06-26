@@ -46,13 +46,11 @@ class PanelRoomsController extends Controller
 
     public function store(PanelRoomCreateRequest $request)
     {
+
         $roomType = $request->room_type_id;
 
         // Create room type if not provided
         if (!$request->room_type_id) {
-            // Get default language from settings
-            $setting = SettingModel::first();
-            $defaultLanguage = $setting->default_language;
 
             $roomType = RoomTypeModel::create([
                 'name_pt' => $request->overview_name_pt,
@@ -79,9 +77,8 @@ class PanelRoomsController extends Controller
             'max_pets' => $request->max_pets,
         ]);
 
-
-        // Handle gallery images (uploaded files)
-        if ($request->gallery && is_array($request->gallery)) {
+        // Handle uploaded gallery files
+        if ($request->gallery && count($request->gallery) > 0) {
             $tenantId = $this->getTenantId();
             foreach ($request->gallery as $gallery) {
                 $filePath = TenantFileAction::save($tenantId, $gallery, true, 'room/gallery');
@@ -96,12 +93,25 @@ class PanelRoomsController extends Controller
 
         // Handle imported gallery images (URLs)
         // When provice import gallery from type, just change in gallery, add room_id
-        if ($request->room_type_id && $request->gallery_imported && is_array($request->gallery_imported)) {
+        if ($request->gallery_imported && is_array($request->gallery_imported)) {
             foreach ($request->gallery_imported as $importedSrc) {
                 if (!$importedSrc) continue;
-                RoomGalleryModel::where('room_type_id', $request->room_type_id)
-                    ->where('src', $importedSrc)
-                    ->update(['room_id' => $room->id]);
+                $updated = false;
+                if ($request->room_type_id) {
+                    $updated = RoomGalleryModel::where('room_type_id', $request->room_type_id)
+                        ->where('src', $importedSrc)
+                        ->update([
+                            'room_id' => $room->id,
+                            'room_type_id' => $request->room_type_id,
+                        ]);
+                }
+                if (!$updated) {
+                    RoomGalleryModel::create([
+                        'room_type_id' => $roomType,
+                        'room_id' => $room->id,
+                        'src' => $importedSrc,
+                    ]);
+                }
             }
         }
 
@@ -113,15 +123,26 @@ class PanelRoomsController extends Controller
             $statusField = $priceField . '_status';
 
             // Only create price record if status is true and price is not empty
-            if ($request->$statusField && !empty($request->$priceField)) {
-                $roomPrice = RoomPriceModel::create([
-                    'room_type_id' => $roomType,
-                    'room_id' => $room->id,
-                    'currency_code' => $currency,
-                    'price' => $request->$priceField,
-                    'price_ilustrative' => $request->$ilustrativeField ?? null,
-                    'status' => $request->$statusField,
-                ]);
+            if (!empty($request->$priceField)) {
+                $updated = false;
+                if ($request->room_type_id) {
+                    $updated = RoomPriceModel::where('room_type_id', $request->room_type_id)
+                        ->where('currency_code', $currency)
+                        ->update([
+                            'room_id' => $room->id,
+                            'room_type_id' => $request->room_type_id,
+                        ]);
+                }
+                if (!$updated) {
+                    RoomPriceModel::create([
+                        'room_type_id' => $roomType,
+                        'room_id' => $room->id,
+                        'currency_code' => $currency,
+                        'price' => $request->$priceField,
+                        'price_ilustrative' => $request->$ilustrativeField ?? null,
+                        'status' => $request->$statusField,
+                    ]);
+                }
             }
         }
 
@@ -133,10 +154,14 @@ class PanelRoomsController extends Controller
                 if ($request->room_type_id) {
                     $updated = RoomComoditeModel::where('room_type_id', $request->room_type_id)
                         ->where('comodite_id', $comoditeId)
-                        ->update(['room_id' => $room->id]);
+                        ->update([
+                            'room_id' => $room->id,
+                            'room_type_id' => $request->room_type_id,
+                        ]);
                 }
                 if (!$updated) {
                     RoomComoditeModel::create([
+                        'room_type_id' => $roomType,
                         'room_id' => $room->id,
                         'comodite_id' => $comoditeId,
                     ]);
@@ -145,7 +170,7 @@ class PanelRoomsController extends Controller
         }
 
 
-        return redirect()->route('panel-room-index')->with('success', 'Room created successfully!');
+        return redirect()->route('panel-room-index', ['tenantId' => $this->getTenantIdHashed()])->with('success', 'Room created successfully!');
     }
 
     public function edit($roomIdHashed)
