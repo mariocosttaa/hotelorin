@@ -43,10 +43,8 @@ class AuthenticatedSessionController extends Controller
         }
 
         return redirect()->intended(
-            route('panel-index', [
-                'locale' => app()->getLocale(),
-            ]
-        ));
+            route('panel-index')
+        );
 
     }
 
