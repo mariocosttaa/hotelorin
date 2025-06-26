@@ -48,7 +48,7 @@ function PanelLoginContent() {
         return () => clearInterval(interval);
     }, []);
 
-    let loginPost = routeLang('auth-lang-login');
+    const loginPost = routeLang('auth-lang-login');
 
     const handleLogin: FormEventHandler = (e) => {
         e.preventDefault();

@@ -6,7 +6,7 @@ import PanelDefaultLayout from '../../layout/PanelDefaultLayout';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { usePage, router, Head } from '@inertiajs/react';
 import type { InertiaMiddlewareProps, InertiaMiddlewareProps as SharedData } from '@/js/shared/types/Inertia-middleware-prop';
-import { Tenant } from '@/js/shared/types/model/Tenants';
+import { Tenant } from '@/js/shared/types/model/manager/Tenants';
 import { Badge } from '../../components/ui/badge';
 import { Card, CardContent } from '../../components/ui/card';
 import { useToast } from '@/js/shared/hooks/useToast';
