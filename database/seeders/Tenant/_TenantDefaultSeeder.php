@@ -24,8 +24,10 @@ class _TenantDefaultSeeder extends Seeder
         // You may need to set the connection dynamically here if your app requires it
 
         $this->call([
+            SettingSeeder::class,
             RankSeeder::class,
             SectorSeeder::class,
+            ComoditeSeeder::class,
         ]);
     }
 }

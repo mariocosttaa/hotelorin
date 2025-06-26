@@ -45,7 +45,7 @@ class CurrencySeeder extends Seeder
             'code' => 'aoa',
             'symbol' => 'Kz',
             'symbol_2' => 'AOA',
-            'decimal_separator' => 3,
+            'decimal_separator' => 2,
         ]);
 
     }
