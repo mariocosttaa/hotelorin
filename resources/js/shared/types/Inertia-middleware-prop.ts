@@ -3,8 +3,8 @@ import type { Config } from 'ziggy-js';
 import Currency from './model/currency';
 import { User } from './model/user';
 import { Tenant } from './model/Tenants';
-import Rank from './model/rank';
-import Sector from './model/sector';
+import Rank from './model/tenant/rank';
+import Sector from './model/tenant/sector';
 
 export interface Auth {
     user: User;

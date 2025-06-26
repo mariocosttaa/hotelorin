@@ -2,9 +2,9 @@ import { toast, ToastOptions } from 'react-toastify';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
-const getDefaultOptions = (isDarkMode: boolean): ToastOptions => ({
+const getDefaultOptions = (isDarkMode: boolean, duration?: number): ToastOptions => ({
   position: 'top-right',
-  autoClose: 3000,
+  autoClose: duration || 3000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,
@@ -15,15 +15,12 @@ const getDefaultOptions = (isDarkMode: boolean): ToastOptions => ({
     color: isDarkMode ? '#f9fafb' : '#111827',
     border: isDarkMode ? '1px solid #374151' : '1px solid #e5e7eb',
   },
-  progressStyle: {
-    background: isDarkMode ? '#e2af04' : '#e2af04',
-  },
 });
 
 export const useToast = () => {
   // We'll get the dark mode state from the context when needed
-  const showToast = (message: string, type: ToastType = 'info', isDarkMode: boolean = false) => {
-    const options = getDefaultOptions(isDarkMode);
+  const showToast = (message: string, type: ToastType = 'info', isDarkMode: boolean = false, duration?: number) => {
+    const options = getDefaultOptions(isDarkMode, duration);
 
     // Add type-specific styling
     if (type === 'success') {
@@ -52,9 +49,9 @@ export const useToast = () => {
   };
 
   return {
-    success: (message: string, isDarkMode: boolean = false) => showToast(message, 'success', isDarkMode),
-    error: (message: string, isDarkMode: boolean = false) => showToast(message, 'error', isDarkMode),
-    warning: (message: string, isDarkMode: boolean = false) => showToast(message, 'warning', isDarkMode),
-    info: (message: string, isDarkMode: boolean = false) => showToast(message, 'info', isDarkMode),
+    success: (message: string, isDarkMode: boolean = false, duration?: number) => showToast(message, 'success', isDarkMode, duration),
+    error: (message: string, isDarkMode: boolean = false, duration?: number) => showToast(message, 'error', isDarkMode, duration),
+    warning: (message: string, isDarkMode: boolean = false, duration?: number) => showToast(message, 'warning', isDarkMode, duration),
+    info: (message: string, isDarkMode: boolean = false, duration?: number) => showToast(message, 'info', isDarkMode, duration),
   };
 };
