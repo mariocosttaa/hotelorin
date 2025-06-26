@@ -16,15 +16,15 @@ class CreateRoomComoditesTable extends _TenantHelperMigration
     {
         Schema::connection($this->connection)->create($this->tenantId.'_room_comodites', function (Blueprint $table) {
             $table->id();
-            $table->string('icon');
-            $table->string('name_pt')->nullable();
-            $table->string('name_en')->nullable();
-            $table->string('name_es')->nullable();
-            $table->string('name_fr')->nullable();
-            $table->string('description_pt')->nullable();
-            $table->string('description_en')->nullable();
-            $table->string('description_es')->nullable();
-            $table->string('description_fr')->nullable();
+            $table->unsignedBigInteger('comodite_id');
+            $table->unsignedBigInteger('room_type_id')->nullable();
+            $table->unsignedBigInteger('room_id')->nullable();
+
+            //Relations
+            $table->foreign('room_type_id')->references('id')->on($this->tenantId.'_room_types')->onDelete('cascade');
+            $table->foreign('room_id')->references('id')->on($this->tenantId.'_rooms')->onDelete('cascade');
+            $table->foreign('comodite_id')->references('id')->on($this->tenantId.'_comodites')->onDelete('cascade');
+
             $table->timestamps();
         });
 
