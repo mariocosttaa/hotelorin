@@ -20,6 +20,7 @@ use App\Models\Manager\UserSectorModel;
 use App\Models\Tenant\RankModel;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
 use Pest\ArchPresets\Custom;
@@ -68,6 +69,24 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
+        // Determine if this is a panel/auth route (no locale in URL) or public (locale in URL)
+        $path = $request->path();
+        $isPanelOrAuth = preg_match('/^(panel|auth)/', $path);
+
+        if ($isPanelOrAuth) {
+            // Try to get locale from authenticated user or cookie
+            $user = Auth::user();
+            $locale = null;
+            if ($user && isset($user->language)) {
+                $locale = $user->language;
+            } elseif ($request->hasCookie('locale')) {
+                $locale = $request->cookie('locale');
+            } else {
+                $locale = config('app.locale');
+            }
+            app()->setLocale($locale);
+        }
+        // For public, SetLocaleMiddleware will already set the locale from the URL
 
         //determine tenant id from url
         $url = $request->url();
@@ -80,7 +99,7 @@ class HandleInertiaRequests extends Middleware
         // Debug: Log the URL and extracted tenantId
         Log::info('HandleInertiaRequests - Full URL: ' . $url);
         Log::info('HandleInertiaRequests - Path: ' . $path);
-        Log::info('HandleInertiaRequests - TenantId: ' . ($tenantId ?? 'null'));
+        Log::info('HandleInertiaRequests - TenantId: ' . ($tenantIdHashed ?? 'null'));
 
         //
 
