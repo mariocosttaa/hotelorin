@@ -17,7 +17,9 @@ Route::middleware(SetLocaleMiddleware::class)->group(function () {
         Route::get('/', PublicHomeController::class)->name('public-home');
 
         // Hotel Page
-        Route::get('/{tenantSlug}', [PublicHotelController::class, 'index'])->name('public-hotel');
+        Route::get('/{tenantSlug}', [PublicHotelController::class, 'index'])
+            ->where('tenantSlug', '^(?!login$|register$|forgot-password$|reset-password$|verify-email$|confirm-password$).+')
+            ->name('public-hotel');
 
     });
 });
