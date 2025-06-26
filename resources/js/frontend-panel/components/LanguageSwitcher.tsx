@@ -8,6 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { setLocaleCookie } from '@/js/shared/cookies/localeCookie';
 
 interface Language {
     code: string;
@@ -27,16 +28,14 @@ const LanguageSwitcher: React.FC = () => {
     const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
 
     const handleChange = (lng: string) => {
-        const url = new URL(window.location.href);
-        const pathParts = url.pathname.split('/');
-        pathParts[1] = lng;
-        url.pathname = pathParts.join('/');
-        i18n.changeLanguage(lng);
-        const currentScrollPosition = window.scrollY;
-        router.visit(url.toString(), {
+        // Update user language via API or Inertia POST (you may need to implement this endpoint)
+        router.post('/panel/user/language', { language: lng }, {
             preserveScroll: true,
-            onSuccess: () => window.scrollTo(0, currentScrollPosition),
+            onSuccess: () => {
+                i18n.changeLanguage(lng);
+            }
         });
+        setLocaleCookie(lng);
     };
 
     return (

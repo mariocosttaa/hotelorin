@@ -5,7 +5,6 @@
 import { useDarkMode } from '@/js/shared/context/DarkModeContext';
 import { routeLang } from '@/js/shared/helpers/routeLang';
 import { InertiaMiddlewareProps } from '@/js/shared/types/Inertia-middleware-prop';
-import { Tenant } from '@/js/shared/types/model/Tenants';
 import { router, usePage } from '@inertiajs/react';
 import { Bed, ChevronDown, Home, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -51,14 +50,24 @@ export default function PanelSidebar({
             icon: <Bed />,
             items: [
                 {
-                    title: 'All Rooms',
+                    title: 'Rooms',
                     url: routeLang('panel-room-index', { tenantId: tenantId }),
                     key: routeLang('panel-room-index', { tenantId: tenantId })
+                },
+                {
+                    title: 'Room Types',
+                    url: routeLang('panel-room-type-index', { tenantId: tenantId }),
+                    key: routeLang('panel-room-type-index', { tenantId: tenantId })
                 },
                 {
                     title: 'Create Room',
                     url: routeLang('panel-room-create', { tenantId: tenantId }),
                     key: routeLang('panel-room-create', { tenantId: tenantId })
+                },
+                {
+                    title: 'Create Room Type',
+                    url: routeLang('panel-room-type-create', { tenantId: tenantId }),
+                    key: routeLang('panel-room-type-create', { tenantId: tenantId })
                 },
             ],
         },

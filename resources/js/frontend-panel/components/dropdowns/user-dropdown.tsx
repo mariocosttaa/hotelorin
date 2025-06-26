@@ -18,6 +18,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
+import { setLocaleCookie } from '@/js/shared/cookies/localeCookie';
 
 interface UserDropdownProps {
     theme: string;
@@ -38,16 +39,14 @@ export function UserDropdown({ theme, setTheme, onOpenProfile, onOpenSettings, o
     };
 
     const changeLanguage = (lng: string) => {
-        const url = new URL(window.location.href);
-        const pathParts = url.pathname.split('/');
-        pathParts[1] = lng;
-        url.pathname = pathParts.join('/');
-        i18n.changeLanguage(lng);
-        const currentScrollPosition = window.scrollY;
-        router.visit(url.toString(), {
+        router.post('/panel/user/language', { language: lng }, {
             preserveScroll: true,
-            onSuccess: () => window.scrollTo(0, currentScrollPosition),
+            onSuccess: () => {
+                i18n.changeLanguage(lng);
+                router.reload();
+            }
         });
+        setLocaleCookie(lng);
     };
 
     return (
