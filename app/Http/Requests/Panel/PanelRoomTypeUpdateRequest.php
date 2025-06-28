@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Panel;
 
 use App\Actions\General\EasyHashAction;
+use App\Actions\General\MoneyAction;
 use App\Models\Tenant\ComoditeModel;
 use App\Models\Tenant\RoomTypeModel;
 use App\Models\Tenant\SettingModel;
@@ -21,12 +22,28 @@ use Illuminate\Validation\Rule;
  * @property string $description_fr
  * @property array $comodites
  * @property mixed $gallery
+ * @property string $price_usd
+ * @property string $price_usd_ilustrative
+ * @property boolean $price_usd_status
+ * @property string $price_eur
+ * @property string $price_eur_ilustrative
+ * @property boolean $price_eur_status
+ * @property string $price_aoa
+ * @property string $price_aoa_ilustrative
+ * @property boolean $price_aoa_status
+ * @property string $price_brl
+ * @property string $price_brl_ilustrative
+ * @property boolean $price_brl_status
+ *
  * @method mixed input(string $key = null, mixed $default = null)
  * @method void merge(array $data)
  * @method mixed route(string $key = null)
+ * @method array all()
  */
 class PanelRoomTypeUpdateRequest extends FormRequest
 {
+    public SettingModel $setting;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -57,6 +74,25 @@ class PanelRoomTypeUpdateRequest extends FormRequest
                 'comodites' => $decodedComodites
             ]);
         }
+
+        // Serialize price values to integers using MoneyAction
+        $currencies = ['USD', 'EUR', 'AOA', 'BRL'];
+        foreach ($currencies as $currency) {
+            $priceField = 'price_' . strtolower($currency);
+            $ilustrativeField = $priceField . '_ilustrative';
+
+            // Serialize real price
+            if ($this->input($priceField) !== null && $this->input($priceField) !== '') {
+                $serializedPrice = MoneyAction::sanitize($this->input($priceField));
+                $this->merge([$priceField => $serializedPrice]);
+            }
+
+            // Serialize illustrative price
+            if ($this->input($ilustrativeField) !== null && $this->input($ilustrativeField) !== '') {
+                $serializedIlustrative = MoneyAction::sanitize($this->input($ilustrativeField));
+                $this->merge([$ilustrativeField => $serializedIlustrative]);
+            }
+        }
     }
 
     /**
@@ -66,7 +102,16 @@ class PanelRoomTypeUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $this->setting = SettingModel::first();
+        $defaultCurrency = $this->setting->default_currency_code;
+        $priceFields = [
+            'USD' => 'price_usd',
+            'EUR' => 'price_eur',
+            'AOA' => 'price_aoa',
+            'BRL' => 'price_brl',
+        ];
+
+        $rules = [
             'name_pt' => 'nullable|string|max:255',
             'name_en' => 'nullable|string|max:255',
             'name_es' => 'nullable|string|max:255',
@@ -80,6 +125,16 @@ class PanelRoomTypeUpdateRequest extends FormRequest
             'comodites' => 'nullable|array|max:10',
             'comodites.*' => Rule::exists(ComoditeModel::class, 'id'),
         ];
+
+        // Add price validation rules
+        foreach ($priceFields as $currency => $field) {
+            $required = $currency === $defaultCurrency ? 'required' : 'nullable';
+            $rules[$field] = [$required, 'integer', 'min:0'];
+            $rules[$field.'_ilustrative'] = ['nullable', 'integer', 'min:0'];
+            $rules[$field.'_status'] = ['required', 'boolean'];
+        }
+
+        return $rules;
     }
 
     /**
@@ -88,43 +143,20 @@ class PanelRoomTypeUpdateRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Get the default language
-            $defaultLanguage = SettingModel::first()->default_language;
-
-            // Check if the required fields for the default language are present
-            $nameField = "name_{$defaultLanguage}";
-            $descriptionField = "description_{$defaultLanguage}";
-
-            $nameValue = $this->input($nameField);
-            $descriptionValue = $this->input($descriptionField);
-
-            // Log the values for debugging
-            Log::info("Validation check for default language {$defaultLanguage}:", [
-                'name_field' => $nameField,
-                'name_value' => $nameValue,
-                'description_field' => $descriptionField,
-                'description_value' => $descriptionValue,
-                'name_empty' => empty(trim($nameValue)),
-                'description_empty' => empty(trim($descriptionValue)),
-            ]);
-
-            // Check if name is empty or only whitespace
-            if (empty(trim($nameValue))) {
-                $validator->errors()->add($nameField, "The {$defaultLanguage} name field is required.");
+            $defaultCurrency = $this->setting->default_currency_code;
+            $field = 'price_' . strtolower($defaultCurrency);
+            $value = $this->input($field);
+            if ($value === null || $value === '' || !is_int($value) || $value < 0) {
+                $validator->errors()->add($field, 'The price for the default currency ('.$defaultCurrency.') is required and must be a positive integer.');
             }
 
-            // Check if description is empty or only whitespace
-            if (empty(trim($descriptionValue))) {
-                $validator->errors()->add($descriptionField, "The {$defaultLanguage} description field is required.");
-            }
-
-            // Add unique validation for all name fields that have values
-            $languages = ['pt', 'en', 'es', 'fr'];
+            // Check for unique names across all languages
             $roomTypeId = null;
             if ($this->route('roomTypeIdHashed')) {
                 $roomTypeId = EasyHashAction::decode($this->route('roomTypeIdHashed'), 'room-type-id');
             }
 
+            $languages = ['pt', 'en', 'es', 'fr'];
             foreach ($languages as $language) {
                 $fieldName = "name_{$language}";
                 $fieldValue = $this->input($fieldName);

@@ -93,9 +93,12 @@ class PanelRoomCreateRequest extends FormRequest
             'AOA' => 'price_aoa',
             'BRL' => 'price_brl',
         ];
+
+        // Check if room_type_id is provided
+        $hasRoomType = $this->input('room_type_id') && !empty($this->input('room_type_id'));
+
         $rules = [
-            ...$this->getRequiredInputByLanguage(),
-            'room_type_id' => ['nullable', Rule::exists(RoomTypeModel::class, 'id'), 'required_without:overview_name_' . $this->setting->default_language],
+            'room_type_id' => ['nullable', Rule::exists(RoomTypeModel::class, 'id')],
             'max_adults' => 'required|integer|min:1',
             'max_children' => 'required|integer|min:0',
             'max_infants' => 'required|integer|min:0',
@@ -107,6 +110,31 @@ class PanelRoomCreateRequest extends FormRequest
             'comodites' => 'nullable|array',
             'comodites.*' => Rule::exists(ComoditeModel::class, 'id'),
         ];
+
+        // Add name/description validation based on whether room_type_id is provided
+        if (!$hasRoomType) {
+            // If no room_type_id, require name and description for default language
+            $defaultLanguage = $this->setting->default_language;
+            $rules["overview_name_{$defaultLanguage}"] = 'required|string|max:255';
+            $rules["overview_description_{$defaultLanguage}"] = 'required|string|max:500';
+
+            // Other languages are optional
+            $languages = ['pt', 'en', 'es', 'fr'];
+            foreach ($languages as $language) {
+                if ($language !== $defaultLanguage) {
+                    $rules["overview_name_{$language}"] = 'nullable|string|max:255';
+                    $rules["overview_description_{$language}"] = 'nullable|string|max:500';
+                }
+            }
+        } else {
+            // If room_type_id is provided, name and description are optional (will inherit from room type)
+            $languages = ['pt', 'en', 'es', 'fr'];
+            foreach ($languages as $language) {
+                $rules["overview_name_{$language}"] = 'nullable|string|max:255';
+                $rules["overview_description_{$language}"] = 'nullable|string|max:500';
+            }
+        }
+
         foreach ($priceFields as $currency => $field) {
             $required = $currency === $defaultCurrency ? 'required' : 'nullable';
             $rules[$field] = [$required, 'integer', 'min:0'];
@@ -114,24 +142,6 @@ class PanelRoomCreateRequest extends FormRequest
             $rules[$field.'_status'] = ['required', 'boolean'];
         }
         return $rules;
-    }
-
-    private function getRequiredInputByLanguage(): array
-    {
-        $defaultLanguage = $this->setting->default_language;
-        $languages = ['pt', 'en', 'es', 'fr'];
-        $requiredInput = [];
-
-        foreach ($languages as $language) {
-            if ($language === $defaultLanguage) {
-                $requiredInput["overview_name_{$language}"] = 'required|string|max:255';
-                $requiredInput["overview_description_{$language}"] = 'required|string|max:500';
-            } else {
-                $requiredInput["overview_name_{$language}"] = 'nullable|string|max:255';
-                $requiredInput["overview_description_{$language}"] = 'nullable|string|max:500';
-            }
-        }
-        return $requiredInput;
     }
 
     public function withValidator($validator)
