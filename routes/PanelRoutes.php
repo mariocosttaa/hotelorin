@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{roomTypeIdHashed}', [PanelRoomsTypeController::class, 'edit'])->name('panel-room-type-edit');
 
                 //Room Types Update Page
-                Route::put('update/{roomTypeIdHashed}', [PanelRoomsTypeController::class, 'update'])->name('panel-room-type-update');
+                Route::post('update/{roomTypeIdHashed}', [PanelRoomsTypeController::class, 'update'])->name('panel-room-type-update');
 
                 //Room Types Delete Page
                 Route::delete('/delete/{roomTypeIdHashed}', [PanelRoomsTypeController::class, 'destroy'])->name('panel-room-type-destroy');
@@ -66,8 +66,17 @@ Route::middleware('auth')->group(function () {
                 //Rooms Store Page
                 Route::post('/store', [PanelRoomsController::class, 'store'])->name('panel-room-store');
 
+                //Rooms Edit Page
+                Route::get('/edit/{roomIdHashed}', [PanelRoomsController::class, 'edit'])->name('panel-room-edit');
+
+                //Rooms Update Page
+                Route::post('/update/{roomIdHashed}', [PanelRoomsController::class, 'update'])->name('panel-room-update');
+
                 //Rooms Delete Page
                 Route::delete('/delete/{roomIdHashed}', [PanelRoomsController::class, 'destroy'])->name('panel-room-destroy');
+
+                //Rooms Gallery Delete
+                Route::delete('/gallery/{roomIdHashed}/{galleryIdHashed}', [PanelRoomsController::class, 'destroyGallery'])->name('panel-room-gallery-destroy');
             });
         });
 
