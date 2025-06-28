@@ -20,6 +20,7 @@ use App\Actions\General\MoneyAction;
  * @property string $overview_description_es
  * @property string $overview_description_fr
  * @property int $room_type_id
+ * @property string $number
  * @property int $max_adults
  * @property int $max_children
  * @property int $max_infants
@@ -99,6 +100,7 @@ class PanelRoomCreateRequest extends FormRequest
 
         $rules = [
             'room_type_id' => ['nullable', Rule::exists(RoomTypeModel::class, 'id')],
+            'number' => 'required|string|max:50|unique:rooms,number',
             'max_adults' => 'required|integer|min:1',
             'max_children' => 'required|integer|min:0',
             'max_infants' => 'required|integer|min:0',
