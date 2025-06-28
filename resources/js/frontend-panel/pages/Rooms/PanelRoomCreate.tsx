@@ -52,7 +52,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
 
     const { data, setData, post, processing, errors: rawErrors } = useForm<{
         room_type_id: string;
-        number: string;
+        number: number | string;
         overview_name_pt: string;
         overview_name_en: string;
         overview_name_es: string;
@@ -302,7 +302,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
     // Sync local state to form data
     React.useEffect(() => {
         setData('room_type_id', data.room_type_id);
-        setData('number', roomNumber);
+        setData('number', roomNumber ? parseInt(roomNumber) : '');
         setData('overview_name_pt', names.pt);
         setData('overview_name_en', names.en);
         setData('overview_name_es', names.es);
@@ -664,9 +664,17 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
                                         <RequiredInput label="Room Number" required htmlFor="room_number">
                                             <Input
                                                 id="room_number"
-                                                placeholder="e.g., 101, A1, Suite 1"
+                                                type="number"
+                                                min="1"
+                                                placeholder="e.g., 101, 201, 301"
                                                 value={roomNumber}
-                                                onChange={(e) => setRoomNumber(e.target.value)}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    // Only allow positive integers
+                                                    if (value === '' || /^\d+$/.test(value)) {
+                                                        setRoomNumber(value);
+                                                    }
+                                                }}
                                                 className={getInputClassName('number')}
                                             />
                                         </RequiredInput>

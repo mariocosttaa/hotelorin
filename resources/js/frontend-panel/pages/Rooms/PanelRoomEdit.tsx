@@ -15,7 +15,7 @@ import { useToast } from '@/js/shared/hooks/useToast';
 import { useTheme } from "../../hooks/use-theme";
 import { X, Plus, Trash2, CircleDollarSign, Coins, DollarSign, Euro } from "lucide-react";
 import comodite from "@/js/shared/types/model/tenant/comodite";
-import Room from "@/js/shared/types/model/tenant/room";
+import { Room } from "@/js/shared/types/model/tenant/room";
 import ComoditesShowModal from '@/js/frontend-panel/components/modals/comodites/ComoditesShowModal';
 import { CurrencyInput } from '@/js/shared/components/form/CurrencyInput';
 import RequiredInput from '@/js/frontend-panel/components/ui/form/RequiredInput';
@@ -31,7 +31,7 @@ interface PanelRoomEditProps {
 
 type RoomForm = {
     room_type_id: string;
-    number: string;
+    number: number | string;
     overview_name_pt: string;
     overview_name_en: string;
     overview_name_es: string;
@@ -267,9 +267,17 @@ export default function PanelRoomEdit({ room, comodites}: PanelRoomEditProps) {
                         <RequiredInput label="Room Number" required htmlFor="room_number">
                             <Input
                                 id="room_number"
-                                placeholder="e.g., 101, A1, Suite 1"
+                                type="number"
+                                min="1"
+                                placeholder="e.g., 101, 201, 301"
                                 value={data.number}
-                                onChange={e => setData('number', e.target.value)}
+                                onChange={e => {
+                                    const value = e.target.value;
+                                    // Only allow positive integers
+                                    if (value === '' || /^\d+$/.test(value)) {
+                                        setData('number', value ? parseInt(value) : '');
+                                    }
+                                }}
                                 className={getInputClassName('number')}
                             />
                         </RequiredInput>
