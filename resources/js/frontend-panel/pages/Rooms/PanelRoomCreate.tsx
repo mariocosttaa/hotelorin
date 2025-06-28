@@ -44,6 +44,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
     // Form state for names/descriptions
     const [names, setNames] = useState({ pt: '', en: '', es: '', fr: '' });
     const [descriptions, setDescriptions] = useState({ pt: '', en: '', es: '', fr: '' });
+    const [roomNumber, setRoomNumber] = useState('');
     const [maxAdults, setMaxAdults] = useState('');
     const [maxChildren, setMaxChildren] = useState('');
     const [maxInfants, setMaxInfants] = useState('');
@@ -51,6 +52,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
 
     const { data, setData, post, processing, errors: rawErrors } = useForm<{
         room_type_id: string;
+        number: string;
         overview_name_pt: string;
         overview_name_en: string;
         overview_name_es: string;
@@ -80,6 +82,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         price_brl_status: boolean;
     }>({
         room_type_id: '',
+        number: '',
         overview_name_pt: '',
         overview_name_en: '',
         overview_name_es: '',
@@ -298,6 +301,8 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
 
     // Sync local state to form data
     React.useEffect(() => {
+        setData('room_type_id', data.room_type_id);
+        setData('number', roomNumber);
         setData('overview_name_pt', names.pt);
         setData('overview_name_en', names.en);
         setData('overview_name_es', names.es);
@@ -313,7 +318,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         setData('gallery', galleryFiles.filter(f => f instanceof File) as File[]);
         setData('gallery_imported', galleryFiles.filter(f => !(f instanceof File)).map(f => (f as any).src) as string[]);
         setData('comodites', selectedComodites as string[]);
-    }, [names, descriptions, maxAdults, maxChildren, maxInfants, maxPets, galleryFiles, selectedComodites, setData]);
+    }, [names, descriptions, roomNumber, maxAdults, maxChildren, maxInfants, maxPets, galleryFiles, selectedComodites, setData]);
 
     const getInputClassName = (fieldName: string) => {
         const hasError = errors[fieldName];
@@ -327,6 +332,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
     // Check for incomplete form fields
     const checkIncompleteFields = () => {
         const hasRoomType = data.room_type_id && data.room_type_id.trim() !== '';
+        const hasRoomNumber = roomNumber && roomNumber.trim() !== '';
         const hasNames = Object.values(names).some(name => name.trim() !== '');
         const hasDescriptions = Object.values(descriptions).some(desc => desc.trim() !== '');
         const hasPrices = [
@@ -338,6 +344,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         const hasCapacity = [maxAdults, maxChildren, maxInfants, maxPets].some(cap => cap && cap.trim() !== '');
 
         return {
+            number: !hasRoomNumber,
             names: !hasRoomType && !hasNames,
             descriptions: !hasRoomType && !hasDescriptions,
             prices: !hasPrices,
@@ -384,7 +391,11 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         setIncompleteFormDialogOpen(false);
         // Focus on the first missing field
         const missingFields = checkIncompleteFields();
-        if (missingFields.names) {
+        if (missingFields.number) {
+            // Focus on room number input
+            const numberInput = document.getElementById('room_number');
+            if (numberInput) numberInput.focus();
+        } else if (missingFields.names) {
             // Focus on first name input - use default language
             const nameInput = document.getElementById(`name_${defaultLanguage}`);
             if (nameInput) nameInput.focus();
@@ -431,6 +442,9 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         setMaxChildren('2');
         setMaxInfants('1');
         setMaxPets('0');
+
+        // Set a default room number (can be changed by user)
+        setRoomNumber('');
 
         // Import prices from roomType.prices
         if (roomType.prices && Array.isArray(roomType.prices)) {
@@ -525,6 +539,7 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         setSelectedRoomType(null);
         setNames({ pt: '', en: '', es: '', fr: '' });
         setDescriptions({ pt: '', en: '', es: '', fr: '' });
+        setRoomNumber('');
         setMaxAdults('');
         setMaxChildren('');
         setMaxInfants('');
@@ -645,6 +660,18 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
                                 </div>
                                 <div className="mb-4">
                                     <div className="mb-2 text-lg font-semibold flex items-center">Room Details <span className="text-red-600 ml-1">*</span></div>
+                                    <div className="mb-4">
+                                        <RequiredInput label="Room Number" required htmlFor="room_number">
+                                            <Input
+                                                id="room_number"
+                                                placeholder="e.g., 101, A1, Suite 1"
+                                                value={roomNumber}
+                                                onChange={(e) => setRoomNumber(e.target.value)}
+                                                className={getInputClassName('number')}
+                                            />
+                                        </RequiredInput>
+                                        {errors.number && (<p className="text-sm text-destructive mt-1">{errors.number}</p>)}
+                                    </div>
                                     <Tabs defaultValue="pt" className="w-full">
                                         <TabsList className="mb-2">
                                             <TabsTrigger value="pt">Portuguese</TabsTrigger>

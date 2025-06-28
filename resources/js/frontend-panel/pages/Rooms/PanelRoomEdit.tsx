@@ -31,6 +31,7 @@ interface PanelRoomEditProps {
 
 type RoomForm = {
     room_type_id: string;
+    number: string;
     overview_name_pt: string;
     overview_name_en: string;
     overview_name_es: string;
@@ -94,6 +95,7 @@ export default function PanelRoomEdit({ room, comodites}: PanelRoomEditProps) {
 
     const { data, setData, post, processing, errors } = useForm<RoomForm>({
         room_type_id: room.room_type_id || '',
+        number: (room.number || '').toString(),
         overview_name_pt: room.overview_name_pt || '',
         overview_name_en: room.overview_name_en || '',
         overview_name_es: room.overview_name_es || '',
@@ -259,6 +261,19 @@ export default function PanelRoomEdit({ room, comodites}: PanelRoomEditProps) {
                             previewSize="md"
                         />
                         {errors.gallery && <p className="text-sm text-destructive mt-1">{errors.gallery}</p>}
+                    </div>
+
+                    <div className="mb-8">
+                        <RequiredInput label="Room Number" required htmlFor="room_number">
+                            <Input
+                                id="room_number"
+                                placeholder="e.g., 101, A1, Suite 1"
+                                value={data.number}
+                                onChange={e => setData('number', e.target.value)}
+                                className={getInputClassName('number')}
+                            />
+                        </RequiredInput>
+                        {errors.number && <p className="text-sm text-destructive mt-1">{errors.number}</p>}
                     </div>
 
                     <div className="mb-8">
