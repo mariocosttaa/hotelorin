@@ -1,5 +1,6 @@
 import RoomComodite from "./roomComodite";
 import RoomGallery from "./roomGallery";
+import RoomPrice from "./roomPrice";
 
 export default interface RoomType {
     id: string;
@@ -23,4 +24,5 @@ export default interface RoomType {
 
     comodites?: RoomComodite[];
     galleries?: RoomGallery[];
+    prices?: RoomPrice[];
 }
