@@ -16,6 +16,7 @@ class RoomResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'number' => $this->number,
             'id' => EasyHashAction::encode($this->id, 'room-id'),
             'room_type_id' => $this->room_type_id ? EasyHashAction::encode($this->room_type_id, 'room-type-id') : null,
 

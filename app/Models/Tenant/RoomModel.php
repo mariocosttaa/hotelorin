@@ -20,7 +20,7 @@ class RoomModel extends TenantModelHelper
     protected $table = 'rooms';
     protected $baseTable = 'rooms';
     protected $fillable = [
-
+        'number',
         //OverWrite
         'overview_name_pt',
         'overview_name_en',

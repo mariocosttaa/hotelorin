@@ -5,6 +5,7 @@ import RoomPrice from "./roomPrice";
 
 export default interface Room {
     id: string;
+    number: number;
     room_type_id?: string;
 
     // Basic room info

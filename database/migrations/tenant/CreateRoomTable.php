@@ -16,6 +16,7 @@ class CreateRoomTable extends _TenantHelperMigration
     {
         Schema::connection($this->connection)->create($this->tenantId.'_rooms', function (Blueprint $table) {
             $table->id();
+            $table->integer('number');
             //OverWrite
             $table->string('overview_name_pt')->nullable();
             $table->string('overview_name_en')->nullable();
@@ -29,7 +30,7 @@ class CreateRoomTable extends _TenantHelperMigration
             $table->string('overview_slug_en')->nullable();
             $table->string('overview_slug_es')->nullable();
             $table->string('overview_slug_fr')->nullable();
-            //Room  
+            //Room
             $table->unsignedBigInteger('room_type_id');
             //Max Capacity
             $table->integer('max_adults')->nullable();
