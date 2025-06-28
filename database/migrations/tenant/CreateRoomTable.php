@@ -29,7 +29,7 @@ class CreateRoomTable extends _TenantHelperMigration
             $table->string('overview_slug_en')->nullable();
             $table->string('overview_slug_es')->nullable();
             $table->string('overview_slug_fr')->nullable();
-            //Room
+            //Room  
             $table->unsignedBigInteger('room_type_id');
             //Max Capacity
             $table->integer('max_adults')->nullable();

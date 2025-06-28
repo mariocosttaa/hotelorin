@@ -18,6 +18,7 @@ class CreateRoomGalleryTable extends _TenantHelperMigration
             $table->id();
             $table->unsignedBigInteger('room_type_id')->nullable();
             $table->unsignedBigInteger('room_id')->nullable();
+            $table->boolean('use_type_gallery_in_room')->default(false);
             $table->enum('type', ['image', 'video']);
             $table->string('src');
 

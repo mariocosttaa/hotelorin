@@ -19,6 +19,7 @@ class CreateRoomComoditesTable extends _TenantHelperMigration
             $table->unsignedBigInteger('comodite_id');
             $table->unsignedBigInteger('room_type_id')->nullable();
             $table->unsignedBigInteger('room_id')->nullable();
+            $table->boolean('use_type_comodites_in_room')->default(false);
 
             //Relations
             $table->foreign('room_type_id')->references('id')->on($this->tenantId.'_room_types')->onDelete('cascade');

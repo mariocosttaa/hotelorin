@@ -18,6 +18,7 @@ class CreateRoomPriceTable extends _TenantHelperMigration
             $table->id();
             $table->unsignedBigInteger('room_id')->nullable();
             $table->unsignedBigInteger('room_type_id')->nullable();
+            $table->boolean('use_type_price_in_room')->default(false);
 
             $table->bigInteger('price');
             $table->bigInteger('price_ilustrative')->nullable();
