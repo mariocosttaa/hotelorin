@@ -8,6 +8,7 @@ export interface CurrencyInputProps extends Omit<InputHTMLAttributes<HTMLInputEl
   decimals?: number;
   locale?: string;
   initialValue?: number | null;
+  value?: number | null;
   returnType?: ReturnType;
   onValueChange?: (rawValue: number | null, formattedValue: string, formValue: number | string | null) => void;
   className?: string;
@@ -22,6 +23,7 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
   decimals = 2,
   locale = 'pt-BR',
   initialValue = null,
+  value = undefined,
   returnType = 'float',
   onValueChange,
   placeholder = 'Enter amount...',
@@ -33,12 +35,28 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
   const [displayValue, setDisplayValue] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
   const lastInitialValue = useRef<number | null>(initialValue);
+  const lastValue = useRef<number | null | undefined>(value);
 
-  // Initialize display value when initialValue changes
+  // If value is provided, treat as controlled
   useEffect(() => {
-    if (initialValue !== lastInitialValue.current) {
-      lastInitialValue.current = initialValue;
+    if (typeof value !== 'undefined') {
+      // Controlled mode
+      if (value === null || value === 0) {
+        setDisplayValue('');
+        setIsEditing(false);
+      } else {
+        const formattedValue = formatCurrency(value, currency, decimals, locale);
+        setDisplayValue(formattedValue);
+        setIsEditing(false);
+      }
+      lastValue.current = value;
+    }
+  }, [value, currency, decimals, locale]);
 
+  // If not controlled, use initialValue
+  useEffect(() => {
+    if (typeof value === 'undefined' && initialValue !== lastInitialValue.current) {
+      lastInitialValue.current = initialValue;
       if (initialValue === null || initialValue === 0) {
         setDisplayValue('');
         setIsEditing(false);
@@ -48,7 +66,7 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
         setIsEditing(false);
       }
     }
-  }, [initialValue, currency, decimals, locale]);
+  }, [initialValue, currency, decimals, locale, value]);
 
   // Handle focus - start editing mode
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
