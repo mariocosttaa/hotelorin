@@ -71,6 +71,7 @@ class PanelRoomsController extends Controller
 
         $room = RoomModel::create([
             'room_type_id' => $roomType,
+            'number' => $request->number,
             'max_adults' => $request->max_adults,
             'max_children' => $request->max_children,
             'max_infants' => $request->max_infants,
@@ -257,6 +258,7 @@ class PanelRoomsController extends Controller
         // Update room basic info
         $room->update([
             'room_type_id' => $roomType,
+            'number' => $request->number,
             'max_adults' => $request->max_adults,
             'max_children' => $request->max_children,
             'max_infants' => $request->max_infants,
