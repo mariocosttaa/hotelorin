@@ -9,6 +9,7 @@ import { Label } from "@/js/frontend-panel/components/ui/label";
 import { Button } from "@/js/frontend-panel/components/ui/button";
 import { FileUpload } from "@/js/frontend-panel/components/ui/file-upload";
 import { Checkbox } from "@/js/frontend-panel/components/ui/checkbox";
+import { Switch } from "@/js/frontend-panel/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/js/frontend-panel/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/js/frontend-panel/components/ui/dialog";
 import { Badge } from "@/js/frontend-panel/components/ui/badge";
@@ -17,10 +18,13 @@ import { FormEventHandler, useState, useEffect } from 'react';
 import { useToast } from '@/js/shared/hooks/useToast';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from "../../hooks/use-theme";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus, Trash2, CircleDollarSign, Coins, DollarSign, Euro } from "lucide-react";
 import comodite from "@/js/shared/types/model/tenant/comodite";
 import RoomType from "@/js/shared/types/model/tenant/roomType";
 import ComoditesShowModal from '@/js/frontend-panel/components/modals/comodites/ComoditesShowModal';
+import { CurrencyInput } from '@/js/shared/components/form/CurrencyInput';
+import RequiredInput from '@/js/frontend-panel/components/ui/form/RequiredInput';
+import React from 'react';
 
 type ImportedImage = { src: string; imported: true; id?: string; type?: string };
 
@@ -41,6 +45,18 @@ type RoomTypeForm = {
     description_fr: string;
     gallery: File[];
     comodites: string[];
+    price_usd: string;
+    price_usd_ilustrative: string;
+    price_usd_status: boolean;
+    price_eur: string;
+    price_eur_ilustrative: string;
+    price_eur_status: boolean;
+    price_aoa: string;
+    price_aoa_ilustrative: string;
+    price_aoa_status: boolean;
+    price_brl: string;
+    price_brl_ilustrative: string;
+    price_brl_status: boolean;
 };
 
 export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage }: PanelRoomTypeEditProps) {
@@ -51,6 +67,9 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deletingGallery, setDeletingGallery] = useState<string | null>(null);
     const [roomTypeData, setRoomTypeData] = useState(roomType);
+
+    // Local state for gallery files (like PanelRoomCreate.tsx)
+    const [galleryFiles, setGalleryFiles] = useState<(File | ImportedImage)[]>([]);
 
     // Show loading if room type is not available
     if (!roomType) {
@@ -77,7 +96,7 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
 
     const activePage = tenantId ? routeLang('panel-room-type-index', { tenantId }) : '';
 
-    const { data, setData, put, processing, errors, reset } = useForm<RoomTypeForm>({
+    const { data, setData, post,    processing, errors, reset } = useForm<RoomTypeForm>({
         name_pt: roomType?.name_pt || '',
         name_en: roomType?.name_en || '',
         name_es: roomType?.name_es || '',
@@ -88,29 +107,214 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
         description_fr: roomType?.description_fr || '',
         gallery: [],
         comodites: roomType?.comodites?.map(comodite => comodite.comodite?.id || '').filter(Boolean) || [],
+        price_usd: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'usd')?.price?.toString() || '',
+        price_usd_ilustrative: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'usd')?.price_ilustrative?.toString() || '',
+        price_usd_status: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'usd')?.status || false,
+        price_eur: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'eur')?.price?.toString() || '',
+        price_eur_ilustrative: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'eur')?.price_ilustrative?.toString() || '',
+        price_eur_status: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'eur')?.status || false,
+        price_aoa: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'aoa')?.price?.toString() || '',
+        price_aoa_ilustrative: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'aoa')?.price_ilustrative?.toString() || '',
+        price_aoa_status: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'aoa')?.status || false,
+        price_brl: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'brl')?.price?.toString() || '',
+        price_brl_ilustrative: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'brl')?.price_ilustrative?.toString() || '',
+        price_brl_status: roomType?.prices?.find(p => p.currency_code.toLowerCase() === 'brl')?.status || false,
     });
 
-    // Update form data when roomType prop changes
-    useEffect(() => {
-        if (roomType) {
-            setRoomTypeData(roomType);
-            setData(prevData => ({
-                name_pt: roomType.name_pt || '',
-                name_en: roomType.name_en || '',
-                name_es: roomType.name_es || '',
-                name_fr: roomType.name_fr || '',
-                description_pt: roomType.description_pt || '',
-                description_en: roomType.description_en || '',
-                description_es: roomType.description_es || '',
-                description_fr: roomType.description_fr || '',
-                gallery: prevData.gallery || [], // Preserve existing gallery files
-                comodites: roomType.comodites?.map(comodite => comodite.comodite?.id || '').filter(Boolean) || [],
-            }));
+    // Sync local gallery state to form data (like PanelRoomCreate.tsx)
+    React.useEffect(() => {
+        const fileFiles = galleryFiles.filter((f): f is File => f instanceof File);
+        setData('gallery', fileFiles);
+    }, [galleryFiles, setData]);
+
+    // Local state for raw price values (for UI logic) - computed from form data
+    const priceUsdRaw = data.price_usd ? (parseInt(data.price_usd) || 0) / 100 : null;
+    const priceUsdIlRaw = data.price_usd_ilustrative ? (parseInt(data.price_usd_ilustrative) || 0) / 100 : null;
+    const priceEurRaw = data.price_eur ? (parseInt(data.price_eur) || 0) / 100 : null;
+    const priceEurIlRaw = data.price_eur_ilustrative ? (parseInt(data.price_eur_ilustrative) || 0) / 100 : null;
+    const priceAoaRaw = data.price_aoa ? (parseInt(data.price_aoa) || 0) / 100 : null;
+    const priceAoaIlRaw = data.price_aoa_ilustrative ? (parseInt(data.price_aoa_ilustrative) || 0) / 100 : null;
+    const priceBrlRaw = data.price_brl ? (parseInt(data.price_brl) || 0) / 100 : null;
+    const priceBrlIlRaw = data.price_brl_ilustrative ? (parseInt(data.price_brl_ilustrative) || 0) / 100 : null;
+
+    // Refs to track previous values and prevent infinite loops
+    const prevPriceUsd = React.useRef(data.price_usd);
+    const prevPriceUsdIl = React.useRef(data.price_usd_ilustrative);
+    const prevPriceEur = React.useRef(data.price_eur);
+    const prevPriceEurIl = React.useRef(data.price_eur_ilustrative);
+    const prevPriceAoa = React.useRef(data.price_aoa);
+    const prevPriceAoaIl = React.useRef(data.price_aoa_ilustrative);
+    const prevPriceBrl = React.useRef(data.price_brl);
+    const prevPriceBrlIl = React.useRef(data.price_brl_ilustrative);
+
+    // Memoized handlers to prevent unnecessary re-renders
+    const handleUsdChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceUsd.current !== newValue) {
+            prevPriceUsd.current = newValue;
+            setData('price_usd', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_usd_status) {
+                setData('price_usd_status', true);
+            } else if (!rawValue && data.price_usd_status) {
+                setData('price_usd_status', false);
+            }
         }
-    }, [roomType]);
+    }, [setData, data.price_usd_status]);
+
+    const handleUsdIlChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceUsdIl.current !== newValue) {
+            prevPriceUsdIl.current = newValue;
+            setData('price_usd_ilustrative', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_usd_status) {
+                setData('price_usd_status', true);
+            } else if (!rawValue && data.price_usd_status) {
+                setData('price_usd_status', false);
+            }
+        }
+    }, [setData, data.price_usd_status]);
+
+    const handleEurChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceEur.current !== newValue) {
+            prevPriceEur.current = newValue;
+            setData('price_eur', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_eur_status) {
+                setData('price_eur_status', true);
+            } else if (!rawValue && data.price_eur_status) {
+                setData('price_eur_status', false);
+            }
+        }
+    }, [setData, data.price_eur_status]);
+
+    const handleEurIlChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceEurIl.current !== newValue) {
+            prevPriceEurIl.current = newValue;
+            setData('price_eur_ilustrative', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_eur_status) {
+                setData('price_eur_status', true);
+            } else if (!rawValue && data.price_eur_status) {
+                setData('price_eur_status', false);
+            }
+        }
+    }, [setData, data.price_eur_status]);
+
+    const handleAoaChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceAoa.current !== newValue) {
+            prevPriceAoa.current = newValue;
+            setData('price_aoa', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_aoa_status) {
+                setData('price_aoa_status', true);
+            } else if (!rawValue && data.price_aoa_status) {
+                setData('price_aoa_status', false);
+            }
+        }
+    }, [setData, data.price_aoa_status]);
+
+    const handleAoaIlChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceAoaIl.current !== newValue) {
+            prevPriceAoaIl.current = newValue;
+            setData('price_aoa_ilustrative', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_aoa_status) {
+                setData('price_aoa_status', true);
+            } else if (!rawValue && data.price_aoa_status) {
+                setData('price_aoa_status', false);
+            }
+        }
+    }, [setData, data.price_aoa_status]);
+
+    const handleBrlChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceBrl.current !== newValue) {
+            prevPriceBrl.current = newValue;
+            setData('price_brl', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_brl_status) {
+                setData('price_brl_status', true);
+            } else if (!rawValue && data.price_brl_status) {
+                setData('price_brl_status', false);
+            }
+        }
+    }, [setData, data.price_brl_status]);
+
+    const handleBrlIlChange = React.useCallback((rawValue: number | null, formattedValue: string, formValue: number | string | null) => {
+        const newValue = formValue?.toString() || '';
+        if (prevPriceBrlIl.current !== newValue) {
+            prevPriceBrlIl.current = newValue;
+            setData('price_brl_ilustrative', newValue);
+            // Only activate status if we have a real value
+            if (rawValue && rawValue > 0 && !data.price_brl_status) {
+                setData('price_brl_status', true);
+            } else if (!rawValue && data.price_brl_status) {
+                setData('price_brl_status', false);
+            }
+        }
+    }, [setData, data.price_brl_status]);
+
+    // Clear price handlers
+    const clearUsdPrices = () => {
+        setData('price_usd', '');
+        setData('price_usd_ilustrative', '');
+        setData('price_usd_status', false);
+        prevPriceUsd.current = '';
+        prevPriceUsdIl.current = '';
+        // Force re-render by updating refs
+        setTimeout(() => {
+            prevPriceUsd.current = '';
+            prevPriceUsdIl.current = '';
+        }, 0);
+    };
+
+    const clearEurPrices = () => {
+        setData('price_eur', '');
+        setData('price_eur_ilustrative', '');
+        setData('price_eur_status', false);
+        prevPriceEur.current = '';
+        prevPriceEurIl.current = '';
+        // Force re-render by updating refs
+        setTimeout(() => {
+            prevPriceEur.current = '';
+            prevPriceEurIl.current = '';
+        }, 0);
+    };
+
+    const clearAoaPrices = () => {
+        setData('price_aoa', '');
+        setData('price_aoa_ilustrative', '');
+        setData('price_aoa_status', false);
+        prevPriceAoa.current = '';
+        prevPriceAoaIl.current = '';
+        // Force re-render by updating refs
+        setTimeout(() => {
+            prevPriceAoa.current = '';
+            prevPriceAoaIl.current = '';
+        }, 0);
+    };
+
+    const clearBrlPrices = () => {
+        setData('price_brl', '');
+        setData('price_brl_ilustrative', '');
+        setData('price_brl_status', false);
+        prevPriceBrl.current = '';
+        prevPriceBrlIl.current = '';
+        // Force re-render by updating refs
+        setTimeout(() => {
+            prevPriceBrl.current = '';
+            prevPriceBrlIl.current = '';
+        }, 0);
+    };
 
     const handleGalleryChange = (files: (File | ImportedImage)[]) => {
-        setData('gallery', files.filter((f): f is File => f instanceof File));
+        setGalleryFiles(files);
     };
 
     const handleComoditeToggle = (comoditeId: string) => {
@@ -137,25 +341,16 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        router.post(submitUrl, {
-            ...data,
-            _method: 'put', // Laravel will treat this as a PUT request
-        }, {
-            forceFormData: true, // Ensures files are sent
-            preserveScroll: true,
-            preserveState: true, // Preserve form state on validation errors
+        post(submitUrl, {
+            preserveScroll: true, // Preserve scroll position
             onError: (errors) => {
+                // Show errors via toast
                 Object.keys(errors).forEach(key => {
                     if (errors[key]) {
                         toast.error(errors[key], isDarkMode.theme === 'dark', 10000);
                     }
                 });
             },
-            onSuccess: () => {
-                // Clear gallery files after successful update
-                setData('gallery', []);
-                toast.success('Room type updated successfully', isDarkMode.theme === 'dark');
-            }
         });
     };
 
@@ -252,7 +447,7 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
 
                         {/* New Gallery Upload */}
                         <FileUpload
-                            files={data.gallery}
+                            files={galleryFiles}
                             onFilesChange={handleGalleryChange}
                             maxFiles={10 - (roomTypeData.galleries?.length || 0)}
                             acceptedExtensions={["image/*", "video/*"]}
@@ -282,7 +477,7 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
                                         >
                                             <div
                                                 className="w-4 h-4 flex items-center justify-center"
-                                                dangerouslySetInnerHTML={{ __html: comodite.icon }}
+                                                dangerouslySetInnerHTML={{ __html: comodite.icon || '' }}
                                             />
                                             <span>{comodite.name}</span>
                                             <button
@@ -463,6 +658,224 @@ export default function PanelRoomTypeEdit({ roomType, comodites, defaultLanguage
                             </div>
                         </TabsContent>
                     </Tabs>
+
+                    {/* Prices Section */}
+                    <div className="mt-12">
+                        <div className="mb-4 text-2xl font-bold text-foreground dark:text-white flex items-center">Prices <span className="text-red-600 ml-2">*</span></div>
+                        <div className="flex flex-col gap-4">
+                            {/* USD */}
+                            <div className="flex flex-row flex-wrap items-center gap-x-8 gap-y-2 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 min-w-[100px]">
+                                    <DollarSign className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+                                    <span className="text-lg font-bold text-foreground dark:text-white">USD</span>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Real Price">
+                                        <CurrencyInput
+                                            currency="USD"
+                                            value={priceUsdRaw}
+                                            returnType="int"
+                                            onValueChange={handleUsdChange}
+                                            placeholder="100"
+                                            className={getInputClassName('price_usd')}
+                                            data-currency="USD"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Illustrative">
+                                        <CurrencyInput
+                                            currency="USD"
+                                            value={priceUsdIlRaw}
+                                            returnType="int"
+                                            onValueChange={handleUsdIlChange}
+                                            placeholder="120"
+                                            className={getInputClassName('price_usd_ilustrative')}
+                                            data-currency="USD_IL"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col items-center min-w-[80px]">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={clearUsdPrices}
+                                        className="h-6 w-6 p-0 mb-1"
+                                        type="button"
+                                        title="Clear USD prices"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                    <Label className="text-foreground dark:text-white">Active</Label>
+                                    <Switch
+                                        checked={data.price_usd_status}
+                                        onCheckedChange={v => setData('price_usd_status', v)}
+                                    />
+                                </div>
+                            </div>
+                            {errors.price_usd && <p className="text-sm text-destructive mt-1">{errors.price_usd}</p>}
+                            {errors.price_usd_ilustrative && <p className="text-sm text-destructive mt-1">{errors.price_usd_ilustrative}</p>}
+
+                            {/* EUR */}
+                            <div className="flex flex-row flex-wrap items-center gap-x-8 gap-y-2 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 min-w-[100px]">
+                                    <Euro className="h-6 w-6 text-indigo-600 dark:text-indigo-300" />
+                                    <span className="text-lg font-bold text-foreground dark:text-white">EUR</span>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Real Price">
+                                        <CurrencyInput
+                                            currency="EUR"
+                                            value={priceEurRaw}
+                                            returnType="int"
+                                            onValueChange={handleEurChange}
+                                            placeholder="100"
+                                            className={getInputClassName('price_eur')}
+                                            data-currency="EUR"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Illustrative">
+                                        <CurrencyInput
+                                            currency="EUR"
+                                            value={priceEurIlRaw}
+                                            returnType="int"
+                                            onValueChange={handleEurIlChange}
+                                            placeholder="120"
+                                            className={getInputClassName('price_eur_ilustrative')}
+                                            data-currency="EUR_IL"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col items-center min-w-[80px]">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={clearEurPrices}
+                                        className="h-6 w-6 p-0 mb-1"
+                                        type="button"
+                                        title="Clear EUR prices"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                    <Label className="text-foreground dark:text-white">Active</Label>
+                                    <Switch
+                                        checked={data.price_eur_status}
+                                        onCheckedChange={v => setData('price_eur_status', v)}
+                                    />
+                                </div>
+                            </div>
+                            {errors.price_eur && <p className="text-sm text-destructive mt-1">{errors.price_eur}</p>}
+                            {errors.price_eur_ilustrative && <p className="text-sm text-destructive mt-1">{errors.price_eur_ilustrative}</p>}
+
+                            {/* AOA */}
+                            <div className="flex flex-row flex-wrap items-center gap-x-8 gap-y-2 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 min-w-[100px]">
+                                    <CircleDollarSign className="h-6 w-6 text-green-600 dark:text-green-300" />
+                                    <span className="text-lg font-bold text-foreground dark:text-white">AOA/KZ</span>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Real Price">
+                                        <CurrencyInput
+                                            currency="AOA"
+                                            value={priceAoaRaw}
+                                            returnType="int"
+                                            onValueChange={handleAoaChange}
+                                            placeholder="100"
+                                            className={getInputClassName('price_aoa')}
+                                            data-currency="AOA"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Illustrative">
+                                        <CurrencyInput
+                                            currency="AOA"
+                                            value={priceAoaIlRaw}
+                                            returnType="int"
+                                            onValueChange={handleAoaIlChange}
+                                            placeholder="120"
+                                            className={getInputClassName('price_aoa_ilustrative')}
+                                            data-currency="AOA_IL"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col items-center min-w-[80px]">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={clearAoaPrices}
+                                        className="h-6 w-6 p-0 mb-1"
+                                        type="button"
+                                        title="Clear AOA prices"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                    <Label className="text-foreground dark:text-white">Active</Label>
+                                    <Switch
+                                        checked={data.price_aoa_status}
+                                        onCheckedChange={v => setData('price_aoa_status', v)}
+                                    />
+                                </div>
+                            </div>
+                            {errors.price_aoa && <p className="text-sm text-destructive mt-1">{errors.price_aoa}</p>}
+                            {errors.price_aoa_ilustrative && <p className="text-sm text-destructive mt-1">{errors.price_aoa_ilustrative}</p>}
+
+                            {/* BRL */}
+                            <div className="flex flex-row flex-wrap items-center gap-x-8 gap-y-2 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 min-w-[100px]">
+                                    <Coins className="h-6 w-6 text-yellow-600 dark:text-yellow-300" />
+                                    <span className="text-lg font-bold text-foreground dark:text-white">BRL</span>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Real Price">
+                                        <CurrencyInput
+                                            currency="BRL"
+                                            value={priceBrlRaw}
+                                            returnType="int"
+                                            onValueChange={handleBrlChange}
+                                            placeholder="100"
+                                            className={getInputClassName('price_brl')}
+                                            data-currency="BRL"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col gap-1 w-40">
+                                    <RequiredInput label="Illustrative">
+                                        <CurrencyInput
+                                            currency="BRL"
+                                            value={priceBrlIlRaw}
+                                            returnType="int"
+                                            onValueChange={handleBrlIlChange}
+                                            placeholder="120"
+                                            className={getInputClassName('price_brl_ilustrative')}
+                                            data-currency="BRL_IL"
+                                        />
+                                    </RequiredInput>
+                                </div>
+                                <div className="flex flex-col items-center min-w-[80px]">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={clearBrlPrices}
+                                        className="h-6 w-6 p-0 mb-1"
+                                        type="button"
+                                        title="Clear BRL prices"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                    <Label className="text-foreground dark:text-white">Active</Label>
+                                    <Switch
+                                        checked={data.price_brl_status}
+                                        onCheckedChange={v => setData('price_brl_status', v)}
+                                    />
+                                </div>
+                            </div>
+                            {errors.price_brl && <p className="text-sm text-destructive mt-1">{errors.price_brl}</p>}
+                            {errors.price_brl_ilustrative && <p className="text-sm text-destructive mt-1">{errors.price_brl_ilustrative}</p>}
+                        </div>
+                    </div>
 
                     <div className="flex justify-end gap-2 mt-8">
                         <Button

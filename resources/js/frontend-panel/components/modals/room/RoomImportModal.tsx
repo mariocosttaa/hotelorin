@@ -3,29 +3,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from '@/js/frontend-panel/components/ui/badge';
 import { Button } from '@/js/frontend-panel/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/js/frontend-panel/components/ui/card';
-import { Wifi, Tv, Coffee, Car, Dumbbell, Waves, Bath, Car as Parking, Utensils, Download, Users, Baby, PawPrint } from 'lucide-react';
+import { Tv, Download, Users, Baby, PawPrint, DollarSign } from 'lucide-react';
 import RoomType from '@/js/shared/types/model/tenant/roomType';
 
-const comoditeIcons: Record<string, any> = {
-  'wifi': Wifi,
-  'tv': Tv,
-  'coffee': Coffee,
-  'car': Car,
-  'gym': Dumbbell,
-  'pool': Waves,
-  'spa': Bath,
-  'restaurant': Utensils,
-  'parking': Parking,
-};
-
-function getComoditeIcon(comoditeName: string) {
-  const normalizedName = comoditeName.toLowerCase();
-  for (const [key, icon] of Object.entries(comoditeIcons)) {
-    if (normalizedName.includes(key)) {
-      return icon;
-    }
-  }
-  return null;
+// Helper for SVG cleaning
+function stripSvgSize(svg: string) {
+  return svg
+    .replace(/class="[^"]*"/g, '')
+    .replace(/width="[^"]*"/g, '')
+    .replace(/height="[^"]*"/g, '');
 }
 
 interface RoomImportModalProps {
@@ -111,13 +97,44 @@ const RoomImportModal: React.FC<RoomImportModalProps> = ({ open, onOpenChange, r
                           </div>
                         </div>
 
+                        {/* Prices Preview */}
+                        {roomType.prices && roomType.prices.length > 0 && (
+                          <div className="mb-3">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                              <DollarSign className="w-3 h-3" />
+                              <span>Prices</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {roomType.prices.slice(0, 3).map((price) => (
+                                <Badge key={price.currency_code} variant="outline" className="text-xs">
+                                  <span className={price.status ? "" : "line-through opacity-70"}>
+                                    {price.price_formatted}
+                                  </span>
+                                  {!price.status && (
+                                    <span className="ml-1 text-xs">(I)</span>
+                                  )}
+                                  {price.price_ilustrative_formatted && (
+                                    <span className="text-muted-foreground ml-1 line-through">
+                                      {price.price_ilustrative_formatted}
+                                    </span>
+                                  )}
+                                </Badge>
+                              ))}
+                              {roomType.prices.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{roomType.prices.length - 3} more
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Amenities Preview */}
                         {roomType.comodites && roomType.comodites.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {roomType.comodites.slice(0, 4).map((roomComodite) => {
                               const comodite = roomComodite.comodite;
                               if (!comodite) return null;
-                              const IconComponent = getComoditeIcon(comodite.name);
                               return (
                                 <Badge key={roomComodite.id} variant="secondary" className="text-xs flex items-center px-2 py-1">
                                   {comodite.icon ? (
@@ -126,7 +143,7 @@ const RoomImportModal: React.FC<RoomImportModalProps> = ({ open, onOpenChange, r
                                       dangerouslySetInnerHTML={{ __html: stripSvgSize(comodite.icon) }}
                                     />
                                   ) : (
-                                    IconComponent && <IconComponent className="w-5 h-5 mr-1" />
+                                    <span className="w-5 h-5 mr-1 bg-primary rounded-full"></span>
                                   )}
                                   {comodite.name}
                                 </Badge>
@@ -185,13 +202,5 @@ const RoomImportModal: React.FC<RoomImportModalProps> = ({ open, onOpenChange, r
     </Dialog>
   );
 };
-
-// Helper for SVG cleaning (if not already present)
-function stripSvgSize(svg: string) {
-  return svg
-    .replace(/class="[^"]*"/g, '')
-    .replace(/width="[^"]*"/g, '')
-    .replace(/height="[^"]*"/g, '');
-}
 
 export default RoomImportModal;
