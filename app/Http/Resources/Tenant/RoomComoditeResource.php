@@ -19,6 +19,7 @@ class RoomComoditeResource extends JsonResource
             'id' => EasyHashAction::encode($this->id, 'room-comodite-id'),
             'room_type_id' => $this->room_type_id ? EasyHashAction::encode($this->room_type_id, 'room-type-id') : null,
             'room_id' => $this->room_id ? EasyHashAction::encode($this->room_id, 'room-id') : null,
+            'use_type_comodites_in_room' => (bool) $this->use_type_comodites_in_room,
 
             //relations
             'comodite' => $this->whenLoaded('comodite', function () {

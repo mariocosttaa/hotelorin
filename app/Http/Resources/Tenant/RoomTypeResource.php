@@ -35,15 +35,21 @@ class RoomTypeResource extends JsonResource
             'slug_es' => $this->slug_es,
             'slug_fr' => $this->slug_fr,
 
-            //relations
+            // Type-specific data (can be inherited by rooms)
             'comodites' => $this->whenLoaded('comodites', function () {
-                return RoomComoditeResource::collection($this->comodites)->resolve();
+                return \App\Http\Resources\Tenant\RoomComoditeResource::collection($this->comodites)->resolve();
             }),
 
             'galleries' => $this->whenLoaded('galleries', function () {
-                return RoomGalleryResource::collection($this->galleries)->resolve();
+                return \App\Http\Resources\Tenant\RoomGalleryResource::collection($this->galleries)->resolve();
             }),
 
-          ];
+            'prices' => $this->whenLoaded('prices', function () {
+                return \App\Http\Resources\Tenant\RoomPriceResource::collection($this->prices)->resolve();
+            }),
+
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

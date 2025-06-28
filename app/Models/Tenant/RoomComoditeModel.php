@@ -16,9 +16,14 @@ class RoomComoditeModel extends TenantModelHelper
         'comodite_id',
         'room_type_id',
         'room_id',
+        'use_type_comodites_in_room',
     ];
 
     public $timestamps = true;
+
+    protected $casts = [
+        'use_type_comodites_in_room' => 'boolean',
+    ];
 
     public function comodite(): BelongsTo
     {

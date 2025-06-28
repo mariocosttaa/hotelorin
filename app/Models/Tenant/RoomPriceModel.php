@@ -17,6 +17,7 @@ class RoomPriceModel extends TenantModelHelper
     protected $fillable = [
         'room_id',
         'room_type_id',
+        'use_type_price_in_room',
         'price',
         'price_ilustrative',
         'currency_code',
@@ -24,6 +25,10 @@ class RoomPriceModel extends TenantModelHelper
     ];
 
     public $timestamps = true;
+
+    protected $casts = [
+        'use_type_price_in_room' => 'boolean',
+    ];
 
     public function getPriceFormattedAttribute(): string
     {

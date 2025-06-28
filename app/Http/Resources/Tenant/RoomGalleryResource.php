@@ -19,6 +19,7 @@ class RoomGalleryResource extends JsonResource
             'id' => EasyHashAction::encode($this->id, 'room-gallery-id'),
             'src' => $this->src,
             'type' => $this->type,
+            'use_type_gallery_in_room' => (bool) $this->use_type_gallery_in_room,
         ];
     }
 }

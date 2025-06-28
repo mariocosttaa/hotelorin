@@ -15,8 +15,13 @@ class RoomGalleryModel extends TenantModelHelper
     protected $fillable = [
         'room_type_id',
         'room_id',
+        'use_type_gallery_in_room',
         'type',
         'src',
+    ];
+
+    protected $casts = [
+        'use_type_gallery_in_room' => 'boolean',
     ];
 
     public function room(): BelongsTo

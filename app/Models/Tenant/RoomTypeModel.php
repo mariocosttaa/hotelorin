@@ -58,4 +58,9 @@ class RoomTypeModel extends TenantModelHelper
         return $this->hasMany(RoomComoditeModel::class, 'room_type_id');
     }
 
+    public function prices(): HasMany
+    {
+        return $this->hasMany(RoomPriceModel::class, 'room_type_id');
+    }
+
 }
