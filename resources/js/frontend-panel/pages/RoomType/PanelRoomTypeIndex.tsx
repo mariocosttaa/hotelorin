@@ -5,7 +5,7 @@ import { usePage, router } from '@inertiajs/react';
 import { InertiaMiddlewareProps } from '@/js/shared/types/Inertia-middleware-prop';
 import { Link } from '@inertiajs/react';
 import { cn } from '@/js/frontend-panel/lib/utils';
-import { Plus, Edit, Trash2, Tv, Wifi, Coffee, Car, Dumbbell, Waves, Bath, Utensils, Eye, X } from "lucide-react";
+import { Plus, Edit, Trash2, Tv, Eye, DollarSign } from "lucide-react";
 import RoomType from "@/js/shared/types/model/tenant/roomType";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/js/frontend-panel/components/ui/card";
 import { Badge } from "@/js/frontend-panel/components/ui/badge";
@@ -20,29 +20,6 @@ import { useTranslation } from 'react-i18next';
 interface PanelRoomTypeIndexProps {
     roomTypes: Array<RoomType>;
 }
-
-// Map comodite names to icons
-const comoditeIcons: Record<string, any> = {
-    'wifi': Wifi,
-    'tv': Tv,
-    'coffee': Coffee,
-    'car': Car,
-    'gym': Dumbbell,
-    'pool': Waves,
-    'spa': Bath,
-    'restaurant': Utensils,
-    'parking': Car, // fallback for parking
-};
-
-const getComoditeIcon = (comoditeName: string) => {
-    const normalizedName = comoditeName.toLowerCase();
-    for (const [key, icon] of Object.entries(comoditeIcons)) {
-        if (normalizedName.includes(key)) {
-            return icon;
-        }
-    }
-    return undefined;
-};
 
 // Helper to strip class, width, and height from SVG string
 function stripSvgSize(svg: string) {
@@ -87,6 +64,33 @@ const RoomTypeCard = memo(function RoomTypeCard({ roomType, onShow, tenantId, on
                     )}
                 </div>
 
+                {/* Prices Section */}
+                {roomType.prices && roomType.prices.length > 0 && (
+                    <div className="mb-3">
+                        <h4 className="font-semibold mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                            <DollarSign className="w-3 h-3" />
+                            Prices
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                            {roomType.prices.map((price) => (
+                                <Badge key={price.currency_code} variant="secondary" className="text-xs">
+                                    <span className={price.status ? "" : "line-through opacity-70"}>
+                                        {price.price_formatted}
+                                    </span>
+                                    {!price.status && (
+                                        <span className="ml-1 text-xs">(I)</span>
+                                    )}
+                                    {price.price_ilustrative_formatted && (
+                                        <span className="text-muted-foreground ml-1 line-through">
+                                            {price.price_ilustrative_formatted}
+                                        </span>
+                                    )}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Amenities */}
                 {roomType.comodites && roomType.comodites.length > 0 ? (
                     <div className="mb-3">
@@ -98,7 +102,6 @@ const RoomTypeCard = memo(function RoomTypeCard({ roomType, onShow, tenantId, on
                             {roomType.comodites.slice(0, 4).map((roomComodite) => {
                                 const comodite = roomComodite.comodite;
                                 if (!comodite) return null;
-                                const IconComponent = getComoditeIcon(comodite.name);
                                 return (
                                     <Tooltip key={roomComodite.id}>
                                         <TooltipTrigger asChild>
@@ -106,14 +109,20 @@ const RoomTypeCard = memo(function RoomTypeCard({ roomType, onShow, tenantId, on
                                                 {comodite.icon ? (
                                                     <span className="h-2.5 w-2.5 mr-1 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: stripSvgSize(comodite.icon) }} />
                                                 ) : (
-                                                    IconComponent && typeof IconComponent === 'function' && <IconComponent className="h-2.5 w-2.5 text-primary mr-1" />
+                                                    <span className="h-2.5 w-2.5 mr-1 bg-primary rounded-full"></span>
                                                 )}
                                                 {comodite.name}
+                                                {roomComodite.use_type_comodites_in_room && (
+                                                    <span className="text-blue-500 text-xs">(H)</span>
+                                                )}
                                             </div>
                                         </TooltipTrigger>
                                         {comodite.description && (
                                             <TooltipContent>
                                                 {comodite.description}
+                                                {roomComodite.use_type_comodites_in_room && (
+                                                    <div className="mt-1 text-blue-500 text-xs">Can be inherited by rooms</div>
+                                                )}
                                             </TooltipContent>
                                         )}
                                     </Tooltip>
@@ -212,6 +221,12 @@ export default function PanelRoomTypeIndex({ roomTypes }: PanelRoomTypeIndexProp
         });
 
         router.delete(deleteUrl, {
+            onSuccess: () => {
+                setDeletingRoomType(null);
+                setShowModal(false);
+                setSelectedRoomType(null);
+                toast.success('Room type deleted successfully', isDarkMode.theme === 'dark');
+            },
             onError: (errors) => {
                 setDeletingRoomType(null);
                 if (errors.error) {
