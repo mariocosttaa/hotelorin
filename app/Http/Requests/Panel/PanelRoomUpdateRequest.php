@@ -126,7 +126,7 @@ class PanelRoomUpdateRequest extends FormRequest
 
         $rules = [
             'room_type_id' => ['nullable', Rule::exists(RoomTypeModel::class, 'id')],
-            'number' => ['required', 'string', 'max:50', Rule::unique('rooms', 'number')->ignore($roomId)],
+            'number' => ['required', 'integer', 'min:1', Rule::unique(RoomModel::class, 'number')->ignore($roomId)],
             'max_adults' => 'required|integer|min:1',
             'max_children' => 'required|integer|min:0',
             'max_infants' => 'required|integer|min:0',

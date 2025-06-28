@@ -9,6 +9,7 @@ use App\Models\Tenant\ComoditeModel;
 use App\Models\Tenant\RoomTypeModel;
 use App\Actions\General\EasyHashAction;
 use App\Actions\General\MoneyAction;
+use App\Models\Tenant\RoomModel;
 
 /**
  * @property string $overview_name_pt
@@ -100,7 +101,7 @@ class PanelRoomCreateRequest extends FormRequest
 
         $rules = [
             'room_type_id' => ['nullable', Rule::exists(RoomTypeModel::class, 'id')],
-            'number' => 'required|string|max:50|unique:rooms,number',
+            'number' => ['required', 'integer', 'min:1', Rule::unique(RoomModel::class, 'number')],
             'max_adults' => 'required|integer|min:1',
             'max_children' => 'required|integer|min:0',
             'max_infants' => 'required|integer|min:0',
