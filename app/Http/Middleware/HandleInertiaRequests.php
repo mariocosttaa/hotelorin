@@ -12,12 +12,14 @@ use App\Http\Resources\Manager\TenantResource;
 use App\Http\Resources\Manager\UserResource;
 use App\Http\Resources\Tenant\RankResource;
 use App\Http\Resources\Tenant\SectorResource;
+use App\Http\Resources\Tenant\SettingResource;
 use App\Models\Manager\CurrencyModel;
 use App\Models\Manager\TenantModel;
 use App\Models\Manager\UserModel;
 use App\Models\Manager\UserRankModel;
 use App\Models\Manager\UserSectorModel;
 use App\Models\Tenant\RankModel;
+use App\Models\Tenant\SettingModel;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,9 +94,10 @@ class HandleInertiaRequests extends Middleware
         $url = $request->url();
         $path = $request->path();
 
-        $tenantGet = $this->getTenant($request, $url, $path);
+        $tenantGet = $this->getTenantAndSetting($request, $url, $path);
         $tenantModel = $tenantGet->model;
         $tenantIdHashed = $tenantGet->idHashed;
+        $setting = $tenantGet->setting;
 
         // Debug: Log the URL and extracted tenantId
         Log::info('HandleInertiaRequests - Full URL: ' . $url);
@@ -105,7 +108,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
-            ...$this->whereIsAuthAndInTenant($tenantIdHashed, $tenantModel),
+            ...$this->whereIsAuthAndInTenant($tenantIdHashed, $tenantModel, $setting),
 
             'locale' => app()->getLocale(),
             'currencies' => CurrencyResource::collection(CurrencyCacheModel::all())->resolve(),
@@ -122,17 +125,19 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 
-    private function whereIsAuthAndInTenant($tenantIdHashed, $tenantModel) {
+    private function whereIsAuthAndInTenant($tenantIdHashed, $tenantModel, $setting) {
+
         return [
             'tenantId' => $tenantIdHashed,
             'tenant' => $tenantModel ? new TenantResource($tenantModel)->resolve() : null,
+            'setting' => $setting ? new SettingResource($setting)->resolve() : null,
         ];
     }
 
     private function auth(request $request, $tenantModel): array {
 
         //check if user are Auth, and if not, return null
-        $user =  AuthCache::getUser($request);
+        $user = AuthCache::getUser($request);
         if(!$user || !$tenantModel) { return ['user' => $user, 'rank' => null, 'sector' => null]; }
 
         //verify Rank
@@ -154,7 +159,7 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 
-    private function getTenant(Request $request, string $url, string $path): object {
+    private function getTenantAndSetting(Request $request, string $url, string $path): object {
 
         if (preg_match('/\/panel\/([a-zA-Z0-9]+)\//', $url, $matches)) {
             $tenantIdHashed = $matches[1];
@@ -173,12 +178,15 @@ class HandleInertiaRequests extends Middleware
             if($tenant) {
                 config(['tenantId' => $tenantId]);
                 $request->merge(['tenant-model' => $tenant]);
+                $setting = SettingModel::first();
+                $request->merge(['setting-model' => $setting]);
             }
         }
 
         return (object ) [
             'model' => $tenant ?? null,
-            'idHashed'  => $tenantIdHashed ?? null
+            'idHashed'  => $tenantIdHashed ?? null,
+            'setting' => $setting ?? null,
         ];
     }
 

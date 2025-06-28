@@ -8,7 +8,7 @@ import { CurrencyProvider } from './shared/context/CurrencyContext';
 import DefaultToastProvider from './shared/components/DefaultToastProvider';
 import { determineCSSByUrl } from './shared/utils/cssLoader';
 
-const appName = import.meta.env.VITE_APP_NAME;
+const appName = import.meta.env.VITE_APP_NAME || 'Hotelorin';
 
 createServer(async (page: any) => {
     // Initialize i18n with language from URL path

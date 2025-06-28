@@ -5,7 +5,7 @@ import './shared/lang/i18n';
 import { CurrencyProvider } from './shared/context/CurrencyContext';
 import DefaultToastProvider from './shared/components/DefaultToastProvider';
 
-const appName = import.meta.env.VITE_APP_NAME;
+const appName = import.meta.env.VITE_APP_NAME || 'Hotelorin';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
