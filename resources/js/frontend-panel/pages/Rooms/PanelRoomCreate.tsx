@@ -432,32 +432,90 @@ export default function PanelRoomCreate({ roomTypes, comodites = [], defaultLang
         setMaxInfants('1');
         setMaxPets('0');
 
-        // Reset prices to defaults since RoomType doesn't have price properties
-        setData('price_usd', '');
-        setData('price_usd_ilustrative', '');
-        setData('price_usd_status', false);
-        setData('price_eur', '');
-        setData('price_eur_ilustrative', '');
-        setData('price_eur_status', false);
-        setData('price_aoa', '');
-        setData('price_aoa_ilustrative', '');
-        setData('price_aoa_status', false);
-        setData('price_brl', '');
-        setData('price_brl_ilustrative', '');
-        setData('price_brl_status', false);
+        // Import prices from roomType.prices
+        if (roomType.prices && Array.isArray(roomType.prices)) {
+            // Filter only type-specific prices that can be inherited
+            const typePrices = roomType.prices.filter(p => p.use_type_price_in_room);
+
+            // Set USD prices
+            const usdPrice = typePrices.find(p => p.currency_code === 'usd');
+            if (usdPrice) {
+                setData('price_usd', usdPrice.price?.toString() || '');
+                setData('price_usd_ilustrative', usdPrice.price_ilustrative?.toString() || '');
+                setData('price_usd_status', usdPrice.status || false);
+            } else {
+                setData('price_usd', '');
+                setData('price_usd_ilustrative', '');
+                setData('price_usd_status', false);
+            }
+
+            // Set EUR prices
+            const eurPrice = typePrices.find(p => p.currency_code === 'eur');
+            if (eurPrice) {
+                setData('price_eur', eurPrice.price?.toString() || '');
+                setData('price_eur_ilustrative', eurPrice.price_ilustrative?.toString() || '');
+                setData('price_eur_status', eurPrice.status || false);
+            } else {
+                setData('price_eur', '');
+                setData('price_eur_ilustrative', '');
+                setData('price_eur_status', false);
+            }
+
+            // Set AOA prices
+            const aoaPrice = typePrices.find(p => p.currency_code === 'aoa');
+            if (aoaPrice) {
+                setData('price_aoa', aoaPrice.price?.toString() || '');
+                setData('price_aoa_ilustrative', aoaPrice.price_ilustrative?.toString() || '');
+                setData('price_aoa_status', aoaPrice.status || false);
+            } else {
+                setData('price_aoa', '');
+                setData('price_aoa_ilustrative', '');
+                setData('price_aoa_status', false);
+            }
+
+            // Set BRL prices
+            const brlPrice = typePrices.find(p => p.currency_code === 'brl');
+            if (brlPrice) {
+                setData('price_brl', brlPrice.price?.toString() || '');
+                setData('price_brl_ilustrative', brlPrice.price_ilustrative?.toString() || '');
+                setData('price_brl_status', brlPrice.status || false);
+            } else {
+                setData('price_brl', '');
+                setData('price_brl_ilustrative', '');
+                setData('price_brl_status', false);
+            }
+        } else {
+            // Reset prices to defaults if no prices found
+            setData('price_usd', '');
+            setData('price_usd_ilustrative', '');
+            setData('price_usd_status', false);
+            setData('price_eur', '');
+            setData('price_eur_ilustrative', '');
+            setData('price_eur_status', false);
+            setData('price_aoa', '');
+            setData('price_aoa_ilustrative', '');
+            setData('price_aoa_status', false);
+            setData('price_brl', '');
+            setData('price_brl_ilustrative', '');
+            setData('price_brl_status', false);
+        }
 
         setSelectedRoomType(roomType);
 
         // Import images from roomType.galleries (array of {src, id, type})
         if (roomType.galleries && Array.isArray(roomType.galleries)) {
-            setGalleryFiles(roomType.galleries.map(g => ({ src: g.src, imported: true, id: g.id?.toString(), type: g.type })));
+            // Filter only type-specific galleries that can be inherited
+            const typeGalleries = roomType.galleries.filter(g => g.use_type_gallery_in_room);
+            setGalleryFiles(typeGalleries.map(g => ({ src: g.src, imported: true, id: g.id?.toString(), type: g.type })));
         } else {
             setGalleryFiles([]);
         }
 
         // Import comodites from roomType
         if (roomType.comodites && Array.isArray(roomType.comodites)) {
-            setSelectedComodites(roomType.comodites.map(rc => rc.comodite?.id).filter((id): id is string => Boolean(id)));
+            // Filter only type-specific comodites that can be inherited
+            const typeComodites = roomType.comodites.filter(rc => rc.use_type_comodites_in_room);
+            setSelectedComodites(typeComodites.map(rc => rc.comodite?.id).filter((id): id is string => Boolean(id)));
         } else {
             setSelectedComodites([]);
         }

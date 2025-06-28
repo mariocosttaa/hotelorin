@@ -16,6 +16,7 @@ import RoomDetailsModal from '@/js/frontend-panel/components/modals/room/RoomDet
 import { useToast } from '@/js/shared/hooks/useToast';
 import { useTheme } from "../../hooks/use-theme";
 
+
 interface PanelRoomIndexProps {
     rooms: Room[];
 }
@@ -43,16 +44,17 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
 
     const activePage = tenantId ? routeLang('panel-room-index', { tenantId: tenantId }) : '';
 
-    // Helper function to get main price (first active price)
+    // Helper function to get main price (first price from full prices, active or inactive)
     const getMainPrice = (room: Room) => {
-        const activePrice = room.prices?.find(p => p.status && p.price > 0);
-        if (!activePrice) return null;
+        const firstPrice = room.prices?.find(p => p.price > 0);
+        if (!firstPrice) return null;
 
         return {
-            currency: activePrice.currency_code.toUpperCase(),
-            price: activePrice.price,
-            priceFormatted: activePrice.price_formatted,
-            priceIlustrative: activePrice.price_ilustrative_formatted,
+            currency: firstPrice.currency_code.toUpperCase(),
+            price: firstPrice.price,
+            priceFormatted: firstPrice.price_formatted,
+            priceIlustrative: firstPrice.price_ilustrative_formatted,
+            isActive: firstPrice.status,
         };
     };
 
@@ -66,31 +68,30 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
         setSelectedRoom(null);
     };
 
-    const handleDeleteRoom = async (roomId: number) => {
-        setDeletingRoom(roomId);
+    const handleDeleteRoom = async (roomId: string) => {
+        setDeletingRoom(parseInt(roomId));
 
-        // TODO: Implement delete functionality
-        // const deleteUrl = routeLangStatic('panel-room-destroy', {
-        //     tenantId,
-        //     roomIdHashed: roomId
-        // });
+        const deleteUrl = routeLangStatic('panel-room-destroy', {
+            tenantId,
+            roomIdHashed: roomId
+        });
 
-        // router.delete(deleteUrl, {
-        //     onError: (errors) => {
-        //         setDeletingRoom(null);
-        //         if (errors.error) {
-        //             toast.error(errors.error, isDarkMode.theme === 'dark');
-        //         } else {
-        //             toast.error('Failed to delete room', isDarkMode.theme === 'dark');
-        //         }
-        //     }
-        // });
-
-        // For now, just show a toast
-        setTimeout(() => {
-            setDeletingRoom(null);
-            toast.error('Delete functionality not implemented yet', isDarkMode.theme === 'dark');
-        }, 1000);
+        router.delete(deleteUrl, {
+            onSuccess: () => {
+                setDeletingRoom(null);
+                setModalOpen(false);
+                setSelectedRoom(null);
+                toast.success('Room deleted successfully', isDarkMode.theme === 'dark');
+            },
+            onError: (errors) => {
+                setDeletingRoom(null);
+                if (errors.error) {
+                    toast.error(errors.error, isDarkMode.theme === 'dark');
+                } else {
+                    toast.error('Failed to delete room', isDarkMode.theme === 'dark');
+                }
+            }
+        });
     };
 
     return (
@@ -197,7 +198,12 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                             {mainPrice && (
                                                 <div className="absolute bottom-2 left-2">
                                                     <Badge variant="default" className="bg-primary/90 backdrop-blur-sm text-primary-foreground">
-                                                        <span className="ml-1">{mainPrice.priceFormatted}</span>
+                                                        <span className={mainPrice.isActive ? "" : "line-through opacity-70"}>
+                                                            {mainPrice.priceFormatted}
+                                                        </span>
+                                                        {!mainPrice.isActive && (
+                                                            <span className="ml-1 text-xs">(Inactive)</span>
+                                                        )}
                                                     </Badge>
                                                 </div>
                                             )}
@@ -246,10 +252,13 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                                 <div className="flex flex-wrap gap-1">
                                                     {room.comodites.slice(0, 4).map((comodite) => (
                                                         <div key={comodite.id} className="flex items-center gap-1 bg-muted/60 rounded px-2 py-0.5 text-xs">
-                                                            {comodite.icon && (
-                                                                <span className="h-2.5 w-2.5 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: stripSvgSize(comodite.icon) }} />
+                                                            {comodite.comodite?.icon && (
+                                                                <span className="h-2.5 w-2.5 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: stripSvgSize(comodite.comodite.icon) }} />
                                                             )}
-                                                            {comodite.name}
+                                                            {comodite.comodite?.name}
+                                                            {comodite.use_type_comodites_in_room && (
+                                                                <span className="text-blue-500">(T)</span>
+                                                            )}
                                                         </div>
                                                     ))}
                                                     {room.comodites.length > 4 && (
@@ -266,11 +275,17 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                             <div className="space-y-1">
                                                 <div className="text-xs font-medium text-muted-foreground">Prices:</div>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {room.prices.filter(p => p.status).map((price) => (
+                                                    {room.prices.map((price) => (
                                                         <Badge key={price.currency_code} variant="secondary" className="text-xs">
-                                                            <span className="ml-1">
+                                                            <span className={price.status ? "" : "line-through opacity-70"}>
                                                                 {price.price_formatted}
                                                             </span>
+                                                            {!price.status && (
+                                                                <span className="ml-1 text-xs">(I)</span>
+                                                            )}
+                                                            {price.use_type_price_in_room && (
+                                                                <span className="text-blue-500 ml-1">(T)</span>
+                                                            )}
                                                         </Badge>
                                                     ))}
                                                 </div>
@@ -283,9 +298,15 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                             <Button size="sm" variant="outline" className="flex-1" onClick={e => { e.stopPropagation(); handleViewDetails(room); }}>
                                                 <Eye className="h-4 w-4" />
                                             </Button>
-                                            <Button size="sm" variant="default" className="flex-1" onClick={e => e.stopPropagation()}>
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
+                                            <Link
+                                                href={routeLang('panel-room-edit', { tenantId, roomIdHashed: room.id })}
+                                                className="flex-1"
+                                                onClick={e => e.stopPropagation()}
+                                            >
+                                                <Button size="sm" variant="default" className="w-full">
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                            </Link>
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
                                                     <Button size="sm" variant="destructive" className="flex-1" onClick={e => e.stopPropagation()}>
@@ -304,9 +325,9 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                                         <AlertDialogAction
                                                             onClick={() => handleDeleteRoom(room.id)}
                                                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                                            disabled={deletingRoom === room.id}
+                                                            disabled={deletingRoom === parseInt(room.id)}
                                                         >
-                                                            {deletingRoom === room.id ? 'Deleting...' : 'Delete'}
+                                                            {deletingRoom === parseInt(room.id) ? 'Deleting...' : 'Delete'}
                                                         </AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
@@ -324,6 +345,8 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                     room={selectedRoom}
                     open={modalOpen}
                     onOpenChange={handleCloseModal}
+                    onDelete={handleDeleteRoom}
+                    isDeleting={deletingRoom === parseInt(selectedRoom.id)}
                 />
             )}
         </PanelLayout>
