@@ -46,6 +46,7 @@ class AuditoryModel extends TenantModelHelper
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(UserModel::class, 'user_id');
+        return $this->belongsTo(UserModel::class, 'user_id')
+            ->on('manager');
     }
 }

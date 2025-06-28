@@ -10,6 +10,7 @@ class CurrencyModel extends ManagerModelHelper
 {
     use HasFactory;
 
+    protected $connection = 'manager';
     protected $table = 'currencies';
 
     protected $fillable = [

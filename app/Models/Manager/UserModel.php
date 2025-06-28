@@ -13,6 +13,7 @@ class UserModel extends UserModelHelper
 
     use HasFactory, Notifiable;
 
+    protected $connection = 'manager';
     protected $table = 'users';
 
     protected $fillable = [

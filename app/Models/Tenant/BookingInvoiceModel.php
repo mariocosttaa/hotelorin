@@ -44,7 +44,8 @@ class BookingInvoiceModel extends TenantModelHelper
 
     public function currency(): BelongsTo
     {
-        return $this->belongsTo(CurrencyModel::class, 'currency_code');
+        return $this->belongsTo(CurrencyModel::class, 'currency_code', 'code')
+            ->on('manager');
     }
 
     protected function getAmountFormattedAttribute(): string

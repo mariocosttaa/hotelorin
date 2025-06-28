@@ -76,6 +76,7 @@ class SettingModel extends TenantModelHelper
 
     public function defaultCurrency(): BelongsTo
     {
-        return $this->belongsTo(CurrencyModel::class, 'default_currency_code', 'code');
+        return $this->belongsTo(CurrencyModel::class, 'default_currency_code', 'code')
+            ->on('manager');
     }
 }
