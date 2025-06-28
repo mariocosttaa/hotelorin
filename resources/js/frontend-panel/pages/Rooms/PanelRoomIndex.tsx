@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/js/frontend-panel/components/ui/pagination";
 import { Plus, Users, Baby, Dog, DollarSign, Euro, CircleDollarSign, Coins, Eye, Edit, Trash2 } from "lucide-react";
 import { cn } from '@/js/frontend-panel/lib/utils';
-import Room from '@/js/shared/types/model/tenant/room';
+import { Room } from '@/js/shared/types/model/tenant/room';
 import RoomDetailsModal from '@/js/frontend-panel/components/modals/room/RoomDetailsModal';
 import { useToast } from '@/js/shared/hooks/useToast';
 import { useTheme } from "../../hooks/use-theme";
@@ -46,7 +46,7 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
 
     // Helper function to get main price (first price from full prices, active or inactive)
     const getMainPrice = (room: Room) => {
-        const firstPrice = room.prices?.find(p => p.price > 0);
+        const firstPrice = room.prices?.find((p: any) => p.price > 0);
         if (!firstPrice) return null;
 
         return {
@@ -177,9 +177,9 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {rooms.map((room) => {
                             const mainPrice = getMainPrice(room);
-                            const roomName = room.name;
-                            const roomDescription = room.description;
-                            const mainImage = room.galleries?.find(g => g.type === 'image')?.src || '/assets/images/products/s1.jpg';
+                            const roomName = room.overview_name_pt || room.overview_name_en || room.overview_name_es || room.overview_name_fr || `Room ${room.number}`;
+                            const roomDescription = room.overview_description_pt || room.overview_description_en || room.overview_description_es || room.overview_description_fr || '';
+                            const mainImage = room.galleries?.find((g: any) => g.type === 'image')?.src || '/assets/images/products/s1.jpg';
 
                             return (
                                 <Card key={room.id} className="hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => handleViewDetails(room)}>
@@ -192,7 +192,7 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                             />
                                             <div className="absolute top-2 right-2">
                                                 <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
-                                                    #{room.id}
+                                                    #{room.number}
                                                 </Badge>
                                             </div>
                                             {mainPrice && (
@@ -226,19 +226,19 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                                 <Users className="h-4 w-4" />
                                                 <span>{room.max_adults}</span>
                                             </div>
-                                            {room.max_children > 0 && (
+                                            {(room.max_children || 0) > 0 && (
                                                 <div className="flex items-center gap-1">
                                                     <Baby className="h-4 w-4" />
                                                     <span>{room.max_children}</span>
                                                 </div>
                                             )}
-                                            {room.max_infants > 0 && (
+                                            {(room.max_infants || 0) > 0 && (
                                                 <div className="flex items-center gap-1">
                                                     <Baby className="h-4 w-4" />
                                                     <span>{room.max_infants}</span>
                                                 </div>
                                             )}
-                                            {room.max_pets > 0 && (
+                                            {(room.max_pets || 0) > 0 && (
                                                 <div className="flex items-center gap-1">
                                                     <Dog className="h-4 w-4" />
                                                     <span>{room.max_pets}</span>
@@ -250,7 +250,7 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                         {room.comodites && room.comodites.length > 0 && (
                                             <div className="mb-3">
                                                 <div className="flex flex-wrap gap-1">
-                                                    {room.comodites.slice(0, 4).map((comodite) => (
+                                                    {room.comodites.slice(0, 4).map((comodite: any) => (
                                                         <div key={comodite.id} className="flex items-center gap-1 bg-muted/60 rounded px-2 py-0.5 text-xs">
                                                             {comodite.comodite?.icon && (
                                                                 <span className="h-2.5 w-2.5 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: stripSvgSize(comodite.comodite.icon) }} />
@@ -275,7 +275,7 @@ export default function PanelRoomIndex({ rooms = [] }: PanelRoomIndexProps) {
                                             <div className="space-y-1">
                                                 <div className="text-xs font-medium text-muted-foreground">Prices:</div>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {room.prices.map((price) => (
+                                                    {room.prices.map((price: any) => (
                                                         <Badge key={price.currency_code} variant="secondary" className="text-xs">
                                                             <span className={price.status ? "" : "line-through opacity-70"}>
                                                                 {price.price_formatted}
